@@ -1,0 +1,51 @@
+# Unity generated
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Uu]serSettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+[Bb]uild/
+[Bb]uilds/
+
+# Locus-generated tool artifact (analyzer props; recreated by Locus)
+Directory.Build.props
+
+# Locus tooling workspace (design/plan sources; not part of the game folder)
+/Locus/
+/Locus.Editor.csproj
+/Locus.MergeTesting.Runtime.csproj
+/Locus.UnityTesting.Editor.csproj
+
+# IDE / project files
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+.vsconfig
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts / crash reports
+*.apk
+*.aab
+*.unitypackage
+*.app
+crashlytics-build.properties
+sysinfo.txt
