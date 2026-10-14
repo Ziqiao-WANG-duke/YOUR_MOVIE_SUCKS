@@ -352,3 +352,21 @@
 - **What broke**：编辑器内直接调 `BuildPipeline` 会与编译器流水线冲突（`CompleteActiveBuildWhilePumping` 抛 `InvalidCastException`、报"scripts had compiler errors"）→ 改为把构建排到编辑器下一帧（`EditorApplication.delayCall`）执行，等价于点菜单，构建成功
 - **重新打包**：`Build/YourMovieSucks_LabB_Windows.zip`（43.7 MB，含本次修复），可发测试者
 - **时间**：约 1 小时
+
+## Oct 13 — 会话 25：文档同步 + git 历史 + 交付打包（按 Lab B 要求）
+
+- **工具**：Locus（编辑器开着；构建走编辑器排队）
+- **Prompt that mattered**：可以（同步设计文档）。这个版本请更新所有有关文档，按 Lab B 要求把除 PROTOTYPE.md / telemetry/ / gameplay 视频以外的都准备好，随后打包最新版本给我
+- **文档同步**（`GDD.md` 与设计源 `Locus/knowledge/design/your-movie-sucks-gdd.md` 两边同时改，保持一致）：
+  - §5.1.4 打错字母：改成「**任何 a–z 错键都算失误**」并写明两种罚法（锁定词条→罚对应怪；纯误击→罚最近那只带词条的怪）+ 每次都 WRONG 闪字/连击清零/计入 `mistypes`
+  - §5.1.5 攻击倒计时：由「3s」更正为**实现值 1.5s**（面板 `attackCountdown`），并标注原设计写 3s
+  - §14.2 逐字母反馈：由「当前字母高亮」改为「未打字母一律白色 + **上方黄色三角箭头**指出当前待输入位置」（世界空间词条与中央输入门同逻辑）
+  - §8 怪物动画：由「Mixamo 自动绑定」改为「**作者自制**模型与 12 段动画，Humanoid 导入、位移摘成根运动后由代码驱动」
+  - `AGENTS.md` 新增 §7「Lab B 交付清单（对照作业要求）」：8 项要求 → 状态 → 位置/说明（含"不做浏览器版/live link"的偏差、未实现 hit-stop 的理由、遥测归档与视频仍待作者）
+- **git 历史**（此前仓库 0 提交）：`.gitignore` 补掉 Locus 工具产物 `Directory.Build.props`，然后按主题分 **11 个提交**：忽略规则 → 四个交付 md + Lab A 输入 → 包清单与工程设置 → 核心循环 → Demo 演出层 + 调参/遥测 → UI（含字母箭头）→ 美术音频资产 → 场景与预制件 → 编辑器工具（含打包脚本）→ 遥测归档 → 其余 meta/inputactions。工作区干净，`.git` 25 MB
+  - ⚠️ 提交作者是仓库里原有的占位身份 `Your Name <Your Name>`，**需要作者改成真名/邮箱**（或告诉我，我重置重提）
+- **交付打包**（两个包，都在 `Build/`）：
+  - `YourMovieSucks_LabB_Windows.zip`（43.7 MB）＝**可玩版本**，给测试者/上传网盘。构建于 22:24（含失误惩罚修复），并做冒烟：`-batchmode -nographics` 跑 18 s 不崩、日志 0 异常、开场对白已起
+  - `YourMovieSucks_LabB_Folder.zip`（38.2 MB）＝**游戏文件夹 + 隐藏 `.git`**（Lab B 提交项「仓库链接 或 含 .git 的 zip」的后半条）。含 2070 个条目：四个交付 md、Assets/Packages/ProjectSettings、telemetry/ 全部 JSON、`.git` 完整历史（1131 个对象）；已排除 Library/Temp/Logs/Build/obj/UserSettings/Locus
+- **What broke**：① 编辑器内直接 `BuildPipeline` 与编译流水线冲突（见上一会话）→ 排队到下一帧；② 写 zip 的 PowerShell 脚本里带中文注释会被 PS 5.1 按 ANSI 读成语法错误 → 脚本改纯 ASCII；③ 第一版 zip 因目录枚举中途抛 IOException 而静默漏掉 Packages/ProjectSettings/telemetry → 改为顶层逐项遍历 + 事后校验条目
+- **时间**：约 1.5 小时
