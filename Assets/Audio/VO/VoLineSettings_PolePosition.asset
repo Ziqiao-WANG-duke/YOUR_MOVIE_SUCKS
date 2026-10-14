@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a97761eab7cab5e4180186b55c87d616, type: 3}
+  m_Name: VoLineSettings_PolePosition
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Demo.VoLineSettings
+  entries:
+  - id: pp_open_dir_01_production_value
+    speed: 1
+    delaySeconds: 0
+    volume: 1
+    startOffsetSeconds: 1
+  - id: pp_end_dir_10_got_the_shot
+    speed: 1
+    delaySeconds: 0.3
+    volume: 1
+    startOffsetSeconds: 0
+  - id: pp_open_agt_03_no
+    speed: 1
+    delaySeconds: 0.3
+    volume: 1
+    startOffsetSeconds: 0
+  - id: pp_open_dir_02_get_on_the_pole
+    speed: 1
+    delaySeconds: 0
+    volume: 1
+    startOffsetSeconds: 0.6
+  - id: pp_end_dir_13_print_it
+    speed: 1
+    delaySeconds: 0
+    volume: 1
+    startOffsetSeconds: 1
+  - id: pp_end_agt_11_hate_this_job
+    speed: 1
+    delaySeconds: 0.2
+    volume: 1
+    startOffsetSeconds: 0
+  - id: pp_ent_agt_07_my_stage
+    speed: 1
+    delaySeconds: 0
+    volume: 1
+    startOffsetSeconds: 1

@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a7e0175c8f21b645b744b1870b696b3, type: 3}
+  m_Name: VoLibrary_PolePosition
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Demo.VoLibrary
+  entries:
+  - id: bgm_show_me_love
+    clip: {fileID: 8300000, guid: 5ebae11c364bc1f43835758d755089ea, type: 3}
+  - id: cg1
+    clip: {fileID: 8300000, guid: 314ea3e6ef6ee9e428f58d17271ff4e9, type: 3}
+  - id: pistol
+    clip: {fileID: 8300000, guid: 4ca46e7caf6c21941a46331326e1b146, type: 3}
+  - id: pp_death_dir_01_cut
+    clip: {fileID: 8300000, guid: aee5937fc2f19da448f6116059d98d88, type: 3}
+  - id: pp_death_dir_02_unusable
+    clip: {fileID: 8300000, guid: b76deb7ed47a6b04d93f1e47c62097a1, type: 3}
+  - id: pp_end_agt_08_there
+    clip: {fileID: 8300000, guid: b97d5831480555b47bf1946397c63c4e, type: 3}
+  - id: pp_end_agt_09_happy_now
+    clip: {fileID: 8300000, guid: ef822b68815922b44a5500158c7eb2e3, type: 3}
+  - id: pp_end_agt_11_hate_this_job
+    clip: {fileID: 8300000, guid: 07cb7b7a9562f9544a0282e3c7e4b383, type: 3}
+  - id: pp_end_dir_10_got_the_shot
+    clip: {fileID: 8300000, guid: 244b4b54a70ed7d4b922324644575a85, type: 3}
+  - id: pp_end_dir_12_great
+    clip: {fileID: 8300000, guid: 398f7fa0595ee1e48a6d26a3b428ae61, type: 3}
+  - id: pp_end_dir_13_print_it
+    clip: {fileID: 8300000, guid: f0dfbf3134f52ed48a527a1195ac7546, type: 3}
+  - id: pp_ent_agt_07_my_stage
+    clip: {fileID: 8300000, guid: daf064f994985274494c370d1cf23cc0, type: 3}
+  - id: pp_hit_agt_01_working_here
+    clip: {fileID: 8300000, guid: e2ef3088efe7f0b4bb3dc2dc47000198, type: 3}
+  - id: pp_hit_agt_02_not_the_face
+    clip: {fileID: 8300000, guid: 94cc6947dc42d5040989d81a5b568992, type: 3}
+  - id: pp_hit_dir_01_ruining_the_shot
+    clip: {fileID: 8300000, guid: 411306d340bb2874abb42c7396598121, type: 3}
+  - id: pp_hit_dir_02_bleeding_toward_camera
+    clip: {fileID: 8300000, guid: 01db7b8ab99ee6446adb4089f2e322c8, type: 3}
+  - id: pp_low_agt_01_little_help
+    clip: {fileID: 8300000, guid: 433a5af9407fd434bb6cce453beffbf9, type: 3}
+  - id: pp_low_agt_02_gonna_die
+    clip: {fileID: 8300000, guid: 8bd8355e392be10488db54a72181b271, type: 3}
+  - id: pp_low_dir_01_keep_going
+    clip: {fileID: 8300000, guid: 3b1e1c75ef21df84f9faae992675fde4, type: 3}
+  - id: pp_low_dir_02_make_it_cinematic
+    clip: {fileID: 8300000, guid: b78cf8a3121b0604a953133452ef0b5a, type: 3}
+  - id: pp_open_agt_03_no
+    clip: {fileID: 8300000, guid: cfff921753cbad14a8db47f512c710db, type: 3}
+  - id: pp_open_agt_06_fuck_you
+    clip: {fileID: 8300000, guid: b2f438c742d92134c9c1a17c634c1216, type: 3}
+  - id: pp_open_dir_01_production_value
+    clip: {fileID: 8300000, guid: a3086404499b0994ebeca0ced9e44337, type: 3}
+  - id: pp_open_dir_02_get_on_the_pole
+    clip: {fileID: 8300000, guid: 73a323e6b6e3a1e4e8e487ea4c44d24f, type: 3}
+  - id: pp_open_dir_04_ten
+    clip: {fileID: 8300000, guid: 1055e2b06de83ce4983f161b7a7aa733, type: 3}
+  - id: pp_open_dir_05_nine
+    clip: {fileID: 8300000, guid: 53dcb71862282ed46bfac7d744acca43, type: 3}
+  - id: typewriter1
+    clip: {fileID: 8300000, guid: e719e99abf661b7409f26e199c34b0e0, type: 3}
+  - id: typewriter2
+    clip: {fileID: 8300000, guid: f35dc707a42ebdc4a90a02982cf988dc, type: 3}
+  - id: typewriter3
+    clip: {fileID: 8300000, guid: 33a35767f41ddcf4f904e1b157255438, type: 3}
+  - id: typewriter4
+    clip: {fileID: 8300000, guid: a27b45f87c592b3439114970cc7ad447, type: 3}
+  - id: typewriter5
+    clip: {fileID: 8300000, guid: 3eb6fb8256e85a54688a781d3741ba99, type: 3}
+  - id: typewriter6
+    clip: {fileID: 8300000, guid: e43d13ffab2824149bd38125956dd446, type: 3}
+  - id: typewriter7
+    clip: {fileID: 8300000, guid: 1c82298e07ff32a4e81b6fd17a147e27, type: 3}
+  - id: typewriter8
+    clip: {fileID: 8300000, guid: 4a1a362cb065fb24c90dca19bffc0c09, type: 3}
