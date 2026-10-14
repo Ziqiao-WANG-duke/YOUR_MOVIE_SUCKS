@@ -1,0 +1,106 @@
+{
+    "appVersion": "0.1.0 / Unity 6000.3.8f1",
+    "scene": "PolePosition",
+    "sessionStart": "2026-10-08 00:15:36",
+    "runs": [],
+    "events": [
+        {
+            "t": 0.0,
+            "type": "run_start",
+            "detail": "index=1 variant=viewfinder_on"
+        },
+        {
+            "t": 0.0,
+            "type": "track_forced",
+            "detail": "to=Director"
+        },
+        {
+            "t": 11.341902732849121,
+            "type": "skip_intro",
+            "detail": ""
+        },
+        {
+            "t": 11.341902732849121,
+            "type": "track_forced",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 14.03923225402832,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 14.54374885559082,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 14.991929054260254,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 15.677250862121582,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 16.28021812438965,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.60s"
+        },
+        {
+            "t": 17.237356185913087,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 18.255512237548829,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 18.821584701538087,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.57s"
+        }
+    ],
+    "switches": [
+        {
+            "t": 14.03923225402832,
+            "from": "Agent",
+            "to": "Director",
+            "effective": false
+        },
+        {
+            "t": 14.54374885559082,
+            "from": "Director",
+            "to": "Agent",
+            "effective": false
+        },
+        {
+            "t": 14.991929054260254,
+            "from": "Agent",
+            "to": "Director",
+            "effective": false
+        },
+        {
+            "t": 15.677250862121582,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        },
+        {
+            "t": 17.237356185913087,
+            "from": "Agent",
+            "to": "Director",
+            "effective": false
+        },
+        {
+            "t": 18.255512237548829,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        }
+    ]
+}
