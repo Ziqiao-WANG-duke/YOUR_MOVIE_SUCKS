@@ -1,0 +1,182 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7541338662265847762
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 936135275741458632}
+  - component: {fileID: 850638695652244642}
+  - component: {fileID: 5215915766494990015}
+  m_Layer: 0
+  m_Name: StripperZombie
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &936135275741458632
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7541338662265847762}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5404945249949443684}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &850638695652244642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7541338662265847762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f04bbae10d7b684cbc2289e96f1a2d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Combat.TypingTarget
+  baseSpeed: 0.5
+  rushSpeed: 1.6
+  attackRange: 1.7
+  attackCountdown: 1.5
+  attackDamage: 35
+  laneOffset: 0
+  laneConvergeStart: 6
+  closeLaneOffset: 0.85
+  rushScaleMultiplier: 1
+  attackLungeScaleMultiplier: 1
+  deathLinger: 0.05
+--- !u!114 &5215915766494990015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7541338662265847762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c036db4587513146a3e1aaf4e03be03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Combat.TypingTargetAnimator
+  animator: {fileID: 2153307511729830942}
+  speedParameter: Speed
+  rushParameter: Rush
+  attackTrigger: Attack
+  deadTrigger: Dead
+  walkValue: 1
+  runValue: 2
+  deathHold: 1.2
+--- !u!1001 &5514798945246019983
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 936135275741458632}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.068745255
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1070350730909333850, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.17166524
+      objectReference: {fileID: 0}
+    - target: {fileID: -1070350730909333850, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.010223135
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_Name
+      value: ZombieModel
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 42657c355e3e3ac40b476d855cbab628, type: 2}
+    - target: {fileID: 5866666021909216657, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_CullingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8417361359673230750, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: eb1d7c3be46482d478fbe795562b8542, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+--- !u!95 &2153307511729830942 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+  m_PrefabInstance: {fileID: 5514798945246019983}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5404945249949443684 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: dc9ddf39de1ecad4397a5494b26816a4, type: 3}
+  m_PrefabInstance: {fileID: 5514798945246019983}
+  m_PrefabAsset: {fileID: 0}
