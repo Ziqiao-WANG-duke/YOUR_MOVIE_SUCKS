@@ -96,7 +96,11 @@ namespace YourMovieSucks.UI
             if (word.Target != null)
             {
                 _follow = word.Target.transform;
-                _offset = new Vector3(0f, ResolveLabelHeight(_follow), 0f);
+                // 弱点词条：锚点本身就是“弱点上方一点”，用给定的固定偏移；
+                // 其它词条仍按目标包围盒自动算（方块/骨骼模型都能用）
+                _offset = word.LabelOffsetY >= 0f
+                    ? new Vector3(0f, word.LabelOffsetY, 0f)
+                    : new Vector3(0f, ResolveLabelHeight(_follow), 0f);
             }
             else
             {

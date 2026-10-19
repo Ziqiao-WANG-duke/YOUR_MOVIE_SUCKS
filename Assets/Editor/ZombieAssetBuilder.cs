@@ -30,6 +30,7 @@ namespace YourMovieSucks.EditorTools
         public const string ControllerPath = RootFolder + "/Zombie.controller";
         public const string PrefabFolder = "Assets/Prefabs";
         public const string PrefabPath = PrefabFolder + "/StripperZombie.prefab";
+        public const string WeaknessSetPath = "Assets/Data/Monsters/Weakness_Zombie.asset";
 
         /// <summary>模型 FBX 的高度（原始单位 cm，Z 轴向上）→ Unity 里应为 1.7 m 左右。</summary>
         private const float ExpectedHeight = 1.70f;
@@ -224,6 +225,50 @@ namespace YourMovieSucks.EditorTools
         }
 
         // ---------------------------------------------------------------- 材质 / 动画状态机 / 预制件
+
+        /// <summary>
+        /// 弱点词池（同屏最多 5 只怪 → 5 条、首字母互不相同 → 吸附锁定永不歧义）。
+        /// 部位/词/骨骼/识别后的简单词全部在这张表里，加内容只改这里。
+        /// </summary>
+        private static readonly (string label, string word, string bone, string simple)[] WeaknessEntries =
+        {
+            ("HEAD",     "HEAD",     "mixamorig:Head",         "HIT"),
+            ("LEG",      "LEG",      "mixamorig:LeftLeg",      "LIE"),
+            ("NECK",     "NECK",     "mixamorig:Neck",         "CUT"),
+            ("SHOULDER", "SHOULDER", "mixamorig:LeftShoulder", "SHUT"),
+            ("MOUTH",    "MOUTH",    "mixamorig:Head",         "EAT"),
+        };
+
+        /// <summary>幂等创建/刷新弱点配置资产。</summary>
+        private static Combat.MonsterWeaknessSet CreateWeaknessSet()
+        {
+            EnsureFolder("Assets/Data");
+            EnsureFolder("Assets/Data/Monsters");
+
+            var set = AssetDatabase.LoadAssetAtPath<Combat.MonsterWeaknessSet>(WeaknessSetPath);
+            if (set == null)
+            {
+                set = ScriptableObject.CreateInstance<Combat.MonsterWeaknessSet>();
+                AssetDatabase.CreateAsset(set, WeaknessSetPath);
+            }
+
+            var so = new SerializedObject(set);
+            var entries = so.FindProperty("entries");
+            entries.arraySize = WeaknessEntries.Length;
+
+            for (int i = 0; i < WeaknessEntries.Length; i++)
+            {
+                var element = entries.GetArrayElementAtIndex(i);
+                element.FindPropertyRelative("partLabel").stringValue = WeaknessEntries[i].label;
+                element.FindPropertyRelative("weakWord").stringValue = WeaknessEntries[i].word;
+                element.FindPropertyRelative("boneName").stringValue = WeaknessEntries[i].bone;
+                element.FindPropertyRelative("simplifiedWord").stringValue = WeaknessEntries[i].simple;
+            }
+
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(set);
+            return set;
+        }
 
         /// <summary>基础色贴图（512 身体图集）：sRGB、无 mip 外的事项、Clamp 避免跨区采样、不压到更小。</summary>
         private static void ConfigureTextureImporter()
@@ -435,6 +480,8 @@ namespace YourMovieSucks.EditorTools
             animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             animator.enabled = true;
 
+            var set = CreateWeaknessSet();
+
             root.AddComponent<Combat.TypingTarget>();
             var target = root.GetComponent<Combat.TypingTarget>();
             var targetSo = new SerializedObject(target);
@@ -454,13 +501,18 @@ namespace YourMovieSucks.EditorTools
             SetProperty(viewSo, "deathHold", p => p.floatValue = DeathHoldSeconds);
             viewSo.ApplyModifiedPropertiesWithoutUndo();
 
+            // 导演轨弱点识别：每只怪一份弱点状态（哪条配置 + 是否已识别 + 弱点骨骼）
+            var weakness = root.AddComponent<Combat.MonsterWeakness>();
+            var weaknessSo = new SerializedObject(weakness);
+            SetProperty(weaknessSo, "set", p => p.objectReferenceValue = set);
+            weaknessSo.ApplyModifiedPropertiesWithoutUndo();
+
             var prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             Object.DestroyImmediate(root);
             return prefab;
         }
 
         // ---------------------------------------------------------------- 场景接线
-
         /// <summary>
         /// 只写 ScriptedEncounter 的 zombiePrefab 与 5 个刷怪锚点的高度：
         /// 老方块的原点在「身体中心」，锚点高度 0.9 表示方块中心（脚底在 0，舞台面在 0.5）；
@@ -500,8 +552,7 @@ namespace YourMovieSucks.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
 
             // 调参面板（F1）的面板值存在场景里，改代码默认值不影响已存在场景 —— 这里同步改掉场景里的值
-            var tuning = Object.FindFirstObjectByType<LabB.LabBTuning>();
-            if (tuning != null)
+            var tuning = Object.FindFirstObjectByType<LabB.LabBTuning>();            if (tuning != null)
             {
                 var tuningSo = new SerializedObject(tuning);
                 SetProperty(tuningSo, "attackRange", p => p.floatValue = EnemyAttackRange);
@@ -522,6 +573,39 @@ namespace YourMovieSucks.EditorTools
                     EditorUtility.SetDirty(found);
                     anchors++;
                 }
+            }
+
+            // 导演轨弱点识别接线：相机上挂特写，Systems 上挂编排视图，词条管理器接 TrackInput（按轨显隐）
+            var cameraGo = Camera.main != null ? Camera.main.gameObject : FindInScene("Main Camera");
+            var systems = FindInScene("Systems");
+
+            if (cameraGo != null)
+            {
+                var closeUp = cameraGo.GetComponent<Level.WeakPointCloseUpCamera>();
+                if (closeUp == null) closeUp = cameraGo.AddComponent<Level.WeakPointCloseUpCamera>();
+                var closeUpSo = new SerializedObject(closeUp);
+                SetProperty(closeUpSo, "targetCamera", p => p.objectReferenceValue = cameraGo.GetComponent<Camera>());
+                SetProperty(closeUpSo, "rail", p => p.objectReferenceValue = Object.FindFirstObjectByType<Level.RailCameraController>());
+                closeUpSo.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            if (systems != null)
+            {
+                var view = systems.GetComponent<Combat.DirectorWeaknessView>();
+                if (view == null) view = systems.AddComponent<Combat.DirectorWeaknessView>();
+                var viewSo = new SerializedObject(view);
+                SetProperty(viewSo, "typing", p => p.objectReferenceValue = Object.FindFirstObjectByType<Typing.TypingController>());
+                SetProperty(viewSo, "trackInput", p => p.objectReferenceValue = Object.FindFirstObjectByType<Input.TrackInput>());
+                SetProperty(viewSo, "closeUp", p => p.objectReferenceValue = cameraGo != null ? cameraGo.GetComponent<Level.WeakPointCloseUpCamera>() : null);
+                viewSo.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            var labelManager = Object.FindFirstObjectByType<YourMovieSucks.UI.WordLabelManager>();
+            if (labelManager != null)
+            {
+                var labelSo = new SerializedObject(labelManager);
+                SetProperty(labelSo, "trackInput", p => p.objectReferenceValue = Object.FindFirstObjectByType<Input.TrackInput>());
+                labelSo.ApplyModifiedPropertiesWithoutUndo();
             }
 
             EditorSceneManager.MarkSceneDirty(scene);

@@ -370,3 +370,24 @@
   - `YourMovieSucks_LabB_Folder.zip`（38.2 MB）＝**游戏文件夹 + 隐藏 `.git`**（Lab B 提交项「仓库链接 或 含 .git 的 zip」的后半条）。含 2070 个条目：四个交付 md、Assets/Packages/ProjectSettings、telemetry/ 全部 JSON、`.git` 完整历史（1131 个对象）；已排除 Library/Temp/Logs/Build/obj/UserSettings/Locus
 - **What broke**：① 编辑器内直接 `BuildPipeline` 与编译流水线冲突（见上一会话）→ 排队到下一帧；② 写 zip 的 PowerShell 脚本里带中文注释会被 PS 5.1 按 ANSI 读成语法错误 → 脚本改纯 ASCII；③ 第一版 zip 因目录枚举中途抛 IOException 而静默漏掉 Packages/ProjectSettings/telemetry → 改为顶层逐项遍历 + 事后校验条目
 - **时间**：约 1.5 小时
+
+## Oct 18 — 会话 26：导演轨「弱点识别」系统（第一版）
+
+- **工具**：Locus（编辑器未连 → 全程短命批处理；含一条自动验收脚本）
+- **Prompt that mattered**：导演轨弱点识别系统的完整需求（切导演轨→红光+弱点词→输入弱点词→特写→换简单词→切回击杀，不动现有玩法）；确认「5 个弱点词轮换」方案后开工
+- **设计决定（作者确认）**：同屏最多 5 只怪 → 弱点池 5 条、首字母互不相同（HEAD/LEG/NECK/SHOULDER/MOUTH），每只怪出生分到未被占用的一条 → 现有「按首字母吸附」永不歧义。识别后的简化词：HIT/LIE/CUT/SHUT/EAT（与演示战斗词首字母不冲突）
+- **新增**：
+  - `MonsterWeaknessSet`（ScriptableObject：部位 / 弱点词 / 骨骼名 / 简化词）+ `Assets/Data/Monsters/Weakness_Zombie.asset`
+  - `MonsterWeakness`（挂在预制件，每只怪一份状态）：按 `boneName` 递归解析骨骼、运行时生成红色发光小球 + 弱点词锚点、脉冲、识别时放大闪光、`Recognized` + `OnRecognized`
+  - `DirectorWeaknessView`（Systems 上）：切轨时显示/回收弱点词、识别后调特写并换词、简化词同首字母冲突时排队等空位
+  - `WeakPointCloseUpCamera`（相机上）：短暂接管相机推到弱点（实测位移 6.55 m、离弱点 1.08 m）、回位并恢复原 pose
+  - `WeaknessFlowVerify`（编辑器脚本 + 菜单 `YourMovieSucks/Verify DIRECTOR WEAKNESS Flow`）：自动跑完作业验收的 8 步
+- **对现有代码的小改动（行为不变）**：`TypingWord` 加 `IsWeakness`/`LabelOffsetY`；`TypingController` 加 `OnWordRemoved` + `SpawnWord` 可选参数；`WordLabelManager` 按轨显隐标签；`WordLabel` 支持固定标签偏移；`RunStats` 弱点词不计入战斗统计、单独计数；`ScriptedEncounter` 生成词条时把原词写进弱点组件；自检「同首字母」断言改为**按轨**统计（跨轨弱点词与战斗词同首字母是无害的）
+- **修复的两个真问题**：
+  - 特写一开始**没真正推进**（相机只动 0.31 m = 抖动幅度）：`Play()` 用 `rail.IsMoving` 判断让位，而验收里把轨道镜头禁用在了"正在推轨"状态上 → 改成「启用中的轨道镜头正在推进才让位」。改后位移 6.55 m
+  - 验收脚本自身 bug：`GameObject.Find` 找不到 inactive 对象，把"标签已隐藏"误判为失败 → 改为连 inactive 一起查
+- **验证**：
+  - 自动验收 **15 pass / 0 fail**（生成怪→战斗词可见→切导演轨战斗词隐藏→红光+HEAD 词出现→输入 HEAD→已识别+特写+换成 HIT→切回可见新词→输入 HIT 击杀→弱点计数 1、战斗字母数 3 不含弱点词），截图 3 张存 `Library/Locus/tmp/weakness-shots/`
+  - 原有 F2 自检 **29 pass / 2 fail**（两条仍是已知无头帧率问题），`no two active words ever shared the same initial letter` 通过、`accuracy=100% words=12 kills=12`
+- **What broke**：无（除上述两个已修问题）
+- **时间**：约 3 小时

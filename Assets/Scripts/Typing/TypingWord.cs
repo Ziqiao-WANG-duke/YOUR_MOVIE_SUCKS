@@ -31,6 +31,12 @@ namespace YourMovieSucks.Typing
         /// <summary>词条绑定的目标对象（如敌人）。可为 null。</summary>
         public GameObject Target { get; }
 
+        /// <summary>导演轨的「弱点识别」词条（不是怪物战斗词）。</summary>
+        public bool IsWeakness { get; }
+
+        /// <summary>标签的固定高度偏移（米）；< 0 表示按目标包围盒自动算（旧行为）。</summary>
+        public float LabelOffsetY { get; }
+
         /// <summary>输入门词条（演出/教学用，如 TYPE: ZOOM）：无视轨道、不挂 World Space 标签。</summary>
         public bool IsGate { get; }
 
@@ -70,7 +76,7 @@ namespace YourMovieSucks.Typing
         }
 
         public TypingWord(string displayText, CharacterTrack track, float timeLimit = 0f, GameObject target = null,
-            bool isGate = false, bool showLabel = true)
+            bool isGate = false, bool showLabel = true, bool isWeakness = false, float labelOffsetY = -1f)
         {
             DisplayText = displayText;
             Track = track;
@@ -80,6 +86,8 @@ namespace YourMovieSucks.Typing
             Target = target;
             IsGate = isGate;
             ShowLabel = showLabel && !isGate;
+            IsWeakness = isWeakness;
+            LabelOffsetY = labelOffsetY;
         }
 
         /// <summary>

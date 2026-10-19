@@ -154,9 +154,22 @@ namespace YourMovieSucks.Demo
             if (zombie == null || zombie.IsDead) yield break;
 
             typing.SpawnWord(word, CharacterTrack.Agent, 0f, zombie.gameObject);
+            BindWeakness(zombie, word);
 
             while (zombie != null && !zombie.IsDead)
                 yield return null;
+        }
+
+        /// <summary>
+        /// 把本局的原始战斗词记到弱点组件上（导演轨弱点识别后要用它算“更简单的战斗词”，
+        /// 以及换词时的同首字母兑底）。没有弱点组件的怪物（灰盒方块）自动忽略。
+        /// </summary>
+        private static void BindWeakness(TypingTarget zombie, string word)
+        {
+            if (zombie == null) return;
+
+            var weakness = zombie.GetComponent<MonsterWeakness>();
+            if (weakness != null) weakness.OriginalWord = word;
         }
 
         // ---------------------------------------------------------------- 刷怪
@@ -175,6 +188,7 @@ namespace YourMovieSucks.Demo
 
             var zombie = CreateEnemy(SpawnPointAt(pointIndex), false, LaneAt(pointIndex), pointIndex);
             typing.SpawnWord(word, CharacterTrack.Agent, 0f, zombie.gameObject);
+            BindWeakness(zombie, word);
             return true;
         }
 

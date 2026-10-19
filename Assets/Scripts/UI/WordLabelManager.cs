@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using YourMovieSucks.Input;
 using YourMovieSucks.Typing;
 
 namespace YourMovieSucks.UI
@@ -10,6 +11,9 @@ namespace YourMovieSucks.UI
     public class WordLabelManager : MonoBehaviour
     {
         [SerializeField] private TypingController typing;
+
+        [Tooltip("用于按轨道显隐词条：特工轨只显示战斗词、导演轨只显示弱点词")]
+        [SerializeField] private TrackInput trackInput;
 
         [Tooltip("词条材质（Assets/Art/Shaders/M_WordLabelOnTop.mat）：ZTest Always + Overlay，保证词条永远可见")]
         [SerializeField] private Material alwaysOnTopMaterial;
@@ -24,6 +28,7 @@ namespace YourMovieSucks.UI
 
             typing.OnWordSpawned += HandleSpawned;
             typing.OnWordCompleted += HandleEnded;
+            typing.OnWordRemoved += HandleEnded;
             typing.OnWordFailed += HandleFailed;
         }
 
@@ -31,9 +36,10 @@ namespace YourMovieSucks.UI
         {
             if (typing != null)
             {
-                typing.OnWordSpawned -= HandleSpawned;
-                typing.OnWordCompleted -= HandleEnded;
-                typing.OnWordFailed -= HandleFailed;
+            typing.OnWordSpawned -= HandleSpawned;
+            typing.OnWordCompleted -= HandleEnded;
+            typing.OnWordRemoved -= HandleEnded;
+            typing.OnWordFailed -= HandleFailed;
             }
         }
 
@@ -60,6 +66,26 @@ namespace YourMovieSucks.UI
         private void HandleFailed(TypingWord word, WordFailReason reason)
         {
             HandleEnded(word);
+        }
+
+        /// <summary>
+        /// 两条轨道显示不同信息：特工轨只看得见战斗词，导演轨只看得见弱点词
+        /// （不允许战斗词和弱点词同时出现在场上）。
+        /// </summary>
+        private void LateUpdate()
+        {
+            if (_labels.Count == 0) return;
+
+            var track = trackInput != null ? trackInput.CurrentTrack : CharacterTrack.Agent;
+
+            foreach (var pair in _labels)
+            {
+                var label = pair.Value;
+                if (label == null || pair.Key == null) continue;
+
+                bool visible = pair.Key.Track == track;
+                if (label.gameObject.activeSelf != visible) label.gameObject.SetActive(visible);
+            }
         }
     }
 }

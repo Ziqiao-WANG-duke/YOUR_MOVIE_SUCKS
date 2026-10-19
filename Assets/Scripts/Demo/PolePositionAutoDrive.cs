@@ -695,20 +695,28 @@ namespace YourMovieSucks.Demo
         {
             if (_clashReported || typing == null) return;
 
-            var initials = new List<char>();
+            // 首字母吸附是**按轨**的：同一轨内不能有两个同首字母的词；
+            // 跨轨（导演轨弱点词 vs 特工轨战斗词）同时存在是设计允许的，不算冲突。
+            var initials = new Dictionary<CharacterTrack, List<char>>();
             foreach (var word in typing.Words)
             {
                 if (word == null || word.IsGate || word.MatchText.Length == 0) continue;
 
+                if (!initials.TryGetValue(word.Track, out var list))
+                {
+                    list = new List<char>();
+                    initials[word.Track] = list;
+                }
+
                 char initial = char.ToUpperInvariant(word.MatchText[0]);
-                if (initials.Contains(initial))
+                if (list.Contains(initial))
                 {
                     _clashReported = true;
-                    Fail($"two active words share the initial '{initial}' (same-initial words must not coexist)");
+                    Fail($"two active words on the same track share the initial '{initial}'");
                     return;
                 }
 
-                initials.Add(initial);
+                list.Add(initial);
             }
         }
 

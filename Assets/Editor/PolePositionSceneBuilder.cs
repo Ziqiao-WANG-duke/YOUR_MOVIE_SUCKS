@@ -136,7 +136,7 @@ namespace YourMovieSucks.EditorTools
         {
             var root = new GameObject("CameraRig").transform;
 
-            var cameraGo = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener), typeof(CameraShake));
+            var cameraGo = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener), typeof(CameraShake), typeof(YourMovieSucks.Level.WeakPointCloseUpCamera));
             cameraGo.transform.SetParent(root, false);
             cameraGo.tag = "MainCamera";
 
@@ -328,6 +328,16 @@ namespace YourMovieSucks.EditorTools
             Set(shakeSo, "targetCamera", p => p.objectReferenceValue = camera);
             shakeSo.ApplyModifiedPropertiesWithoutUndo();
 
+            // 导演轨弱点特写（只临时接管相机，结束后恢复原 pose）
+            var closeUp = camera.GetComponent<YourMovieSucks.Level.WeakPointCloseUpCamera>();
+            if (closeUp != null)
+            {
+                var closeUpSo = new SerializedObject(closeUp);
+                Set(closeUpSo, "targetCamera", p => p.objectReferenceValue = camera);
+                Set(closeUpSo, "rail", p => p.objectReferenceValue = rail);
+                closeUpSo.ApplyModifiedPropertiesWithoutUndo();
+            }
+
             var railSo = new SerializedObject(rail);
             Set(railSo, "targetCamera", p => p.objectReferenceValue = camera);
             Set(railSo, "track", p => p.objectReferenceValue = dollyTrack);
@@ -489,12 +499,27 @@ namespace YourMovieSucks.EditorTools
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
 
+            // 导演轨弱点识别编排：挂在 Systems 上（与 TypingController / TrackInput 同物件）
+            var systemsGo = refs.Encounter != null ? refs.Encounter.gameObject : null;
+            if (systemsGo != null)
+            {
+                var weaknessView = systemsGo.GetComponent<YourMovieSucks.Combat.DirectorWeaknessView>();
+                if (weaknessView == null) weaknessView = systemsGo.AddComponent<YourMovieSucks.Combat.DirectorWeaknessView>();
+                var weaknessSo = new SerializedObject(weaknessView);
+                Set(weaknessSo, "typing", p => p.objectReferenceValue = refs.Typing);
+                Set(weaknessSo, "trackInput", p => p.objectReferenceValue = refs.TrackInput);
+                Set(weaknessSo, "closeUp", p => p.objectReferenceValue =
+                    camera != null ? camera.GetComponent<YourMovieSucks.Level.WeakPointCloseUpCamera>() : null);
+                weaknessSo.ApplyModifiedPropertiesWithoutUndo();
+            }
+
             var labelManager = UnityEngine.Object.FindFirstObjectByType<WordLabelManager>();
             if (labelManager != null)
             {
                 var overlayMaterial = CreateOverlayMaterial();
                 var so = new SerializedObject(labelManager);
                 Set(so, "typing", p => p.objectReferenceValue = refs.Typing);
+                Set(so, "trackInput", p => p.objectReferenceValue = refs.TrackInput);
                 Set(so, "alwaysOnTopMaterial", p => p.objectReferenceValue = overlayMaterial);
                 so.ApplyModifiedPropertiesWithoutUndo();
             }

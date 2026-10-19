@@ -35,6 +35,7 @@ Assets/Scripts/Demo/ <- Demo 演出层（序列状态机 / 对白 / 中央提示
 Assets/Scripts/LabB/ <- Lab B 交付物代码（调参面板 / 遥测导出）
 Assets/Editor/       <- 编辑器工具（关卡场景生成器 / 丧尸资产工具 / 批处理自检入口 / 构建脚本）
 Assets/Art/          <- 美术资产：`PolePosition/` 关卡灰盒材质 + `Shaders/` + **`Monsters/Zombie/`**
+Assets/Data/Monsters/ <- 怪物数据配置（Weakness_Zombie.asset = 5 条弱点：部位/弱点词/骨骼/简化词）
 Assets/Art/Monsters/Zombie/ <- 丧尸敌人：**模型与配套动画均为作者自制**（不是商店/他人素材），`Zombie.fbx`（人形骨架 + 网格）、`Animations/` 12 段、`Textures/` 基础色贴图、`M_Zombie.mat`、`Zombie.controller`
 Assets/Prefabs/      <- 预制件：`StripperZombie.prefab`（= 关卡里的丧尸敌人：Animator + TypingTarget + TypingTargetAnimator）
 Assets/Audio/        <- 音频：VO/ 配音（文件名 = 台词 id）+ SFX/ 音效 + BGM/ 音乐；VoLibrary_PolePosition.asset 是 id→clip 映射
@@ -53,6 +54,8 @@ Locus/knowledge/     <- 设计源与执行计划（不入库）
 **重建关卡场景**（可复现，不用手摆 Hierarchy）：菜单 `YourMovieSucks/Build POLE POSITION Scene`；
 校验接线：`YourMovieSucks/Validate POLE POSITION Scene`；自动打完整关自检：按 `F2`，或菜单
 `YourMovieSucks/Run POLE POSITION Self-Test (Play Mode)`。
+
+**导演轨弱点识别验收**：菜单 `YourMovieSucks/Verify DIRECTOR WEAKNESS Flow`（自动跑完 8 步流程，报告写 `Library/Locus/tmp/weakness-verify.txt`；批处理 `-executeMethod YourMovieSucks.EditorTools.WeaknessFlowVerify.Run`）。
 
 **怪物（丧尸）资产**：菜单 `YourMovieSucks/Monsters/0 · 一键：导入丧尸 + 建资产 + 接线场景`
 （导入设置（人形 / 原地动画 / 片段命名+循环）→ 材质 `M_Zombie` → Animator `Zombie.controller` → `Assets/Prefabs/StripperZombie.prefab` → 接进场景），

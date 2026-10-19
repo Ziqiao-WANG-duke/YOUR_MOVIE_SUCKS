@@ -53,6 +53,7 @@ namespace YourMovieSucks.Typing
 
         public event System.Action<TypingWord> OnWordSpawned;
         public event System.Action<TypingWord> OnWordCompleted;
+        public event System.Action<TypingWord> OnWordRemoved;
         public event System.Action<TypingWord, WordFailReason> OnWordFailed;
         public event System.Action<TypingWord, int> OnLetterMatched;
         public event System.Action<TypingWord, Key> OnLetterMismatch;
@@ -82,11 +83,12 @@ namespace YourMovieSucks.Typing
                 trackInput.OnLetterTyped -= HandleLetter;
         }
 
-        public TypingWord SpawnWord(string displayText, CharacterTrack track, float timeLimit = 0f, GameObject target = null)
+        public TypingWord SpawnWord(string displayText, CharacterTrack track, float timeLimit = 0f, GameObject target = null,
+            bool isWeakness = false, float labelOffsetY = -1f)
         {
-            var word = new TypingWord(displayText, track, timeLimit, target);
+            var word = new TypingWord(displayText, track, timeLimit, target, false, true, isWeakness, labelOffsetY);
             _words.Add(word);
-            Log($"SPAWN [{TrackLabel(track)}] \"{word.DisplayText}\" -> {word.MatchText}");
+            Log($"SPAWN [{TrackLabel(track)}] \"{word.DisplayText}\" -> {word.MatchText}{(isWeakness ? " (weakness)" : string.Empty)}");
             OnWordSpawned?.Invoke(word);
             return word;
         }
@@ -120,7 +122,9 @@ namespace YourMovieSucks.Typing
             if (_agentLocked == word) _agentLocked = null;
             if (_directorLocked == word) _directorLocked = null;
             if (_gate == word) _gate = null;
-            _words.Remove(word);
+            if (!_words.Remove(word)) return;
+
+            OnWordRemoved?.Invoke(word);
         }
 
         private void HandleLetter(CharacterTrack track, Key key)

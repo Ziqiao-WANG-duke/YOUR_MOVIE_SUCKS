@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 936135275741458632}
   - component: {fileID: 850638695652244642}
   - component: {fileID: 5215915766494990015}
+  - component: {fileID: 9209566081535598479}
   m_Layer: 0
   m_Name: StripperZombie
   m_TagString: Untagged
@@ -77,6 +78,22 @@ MonoBehaviour:
   walkValue: 1
   runValue: 2
   deathHold: 1.2
+--- !u!114 &9209566081535598479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7541338662265847762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4908507cc992c44fa10f576997fa8d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Combat.MonsterWeakness
+  set: {fileID: 11400000, guid: 9d23377531922b74facecefc848e393e, type: 2}
+  markerSize: 0.17
+  markerColor: {r: 1, g: 0.12, b: 0.12, a: 1}
+  markerPulseHz: 2.2
 --- !u!1001 &5514798945246019983
 PrefabInstance:
   m_ObjectHideFlags: 0

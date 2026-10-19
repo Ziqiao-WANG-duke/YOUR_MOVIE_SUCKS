@@ -32,6 +32,9 @@ namespace YourMovieSucks.Demo
         public int DirectorWords { get; private set; }
         public int Kills { get; private set; }
 
+        /// <summary>导演轨成功识别弱点的次数（不计入战斗单词/准确率/WPM）。</summary>
+        public int WeaknessRecognitions { get; private set; }
+
         private float _runStartUnscaled;
         private float _lastDuration;
 
@@ -95,6 +98,7 @@ namespace YourMovieSucks.Demo
             RunIndex++;
             WordsTyped = 0;
             LettersTyped = 0;
+            WeaknessRecognitions = 0;
             Mistypes = 0;
             AgentWords = 0;
             DirectorWords = 0;
@@ -112,12 +116,24 @@ namespace YourMovieSucks.Demo
             OnRunEnded?.Invoke(cause);
         }
 
-        private void HandleMatched(TypingWord word, int progress) => LettersTyped++;
+        private void HandleMatched(TypingWord word, int progress)
+        {
+            // 导演轨的「弱点识别」词条不计入战斗统计（acc / WPM / words 只反映战斗内容）
+            if (word.IsWeakness) return;
+            LettersTyped++;
+        }
 
         private void HandleMismatch(TypingWord word, Key key) => Mistypes++;
 
         private void HandleCompleted(TypingWord word)
         {
+            // 弱点识别单独计数，不进战斗统计
+            if (word.IsWeakness)
+            {
+                WeaknessRecognitions++;
+                return;
+            }
+
             // 输入门（演出/教学用，如 TYPE: ZOOM）只计字母，不计入词数与击杀，
             // 保证结算屏的 WORDS TYPED / ENEMIES KILLED 只反映战斗内容。
             if (word.IsGate) return;
