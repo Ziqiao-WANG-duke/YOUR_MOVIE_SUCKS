@@ -57,6 +57,8 @@ Locus/knowledge/     <- 设计源与执行计划（不入库）
 
 **导演轨弱点识别验收**：菜单 `YourMovieSucks/Verify DIRECTOR WEAKNESS Flow`（自动跑完 8 步流程，报告写 `Library/Locus/tmp/weakness-verify.txt`；批处理 `-executeMethod YourMovieSucks.EditorTools.WeaknessFlowVerify.Run`）。
 
+**词条字体 + 威胁配色验收**：菜单 `YourMovieSucks/Verify ENEMY LABEL Font + Threat Tint`（检查 Special Elite 已导入、白→黄→红三段颜色、颜色连续无跳变、攻击中闪烁；报告写 `Library/Locus/tmp/word-tint-verify.txt`，截图存 `Library/Locus/tmp/tint-shots/`；批处理 `-executeMethod YourMovieSucks.EditorTools.WordTintVerify.Run`）。
+
 **怪物（丧尸）资产**：菜单 `YourMovieSucks/Monsters/0 · 一键：导入丧尸 + 建资产 + 接线场景`
 （导入设置（人形 / 原地动画 / 片段命名+循环）→ 材质 `M_Zombie` → Animator `Zombie.controller` → `Assets/Prefabs/StripperZombie.prefab` → 接进场景），
 `…/2 · 核对丧尸资产` 只打印核对报告。批处理：`-executeMethod YourMovieSucks.EditorTools.ZombieAssetBuilder.BuildAndWire`；

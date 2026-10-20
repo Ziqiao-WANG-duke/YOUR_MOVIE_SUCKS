@@ -410,3 +410,21 @@
 - **文档**：`GDD.md` / 设计源 §16 补「特写期间怪物定格」与新的 17 项断言
 - **What broke**：无
 - **时间**：约 1 小时
+
+## Oct 20 — 会话 28：词条字体（Special Elite）+ 攻击威胁配色
+
+- **工具**：Locus（编辑器在跑自检后退出，全程 `dotnet build` 做编译校验，运行期验收待编辑器重开）
+- **Prompt that mattered**：给怪物攻击加提示；单词字体换成刚装的 Special Elite；颜色白/黄/红对应「远处/正在靠近/准备攻击」，攻击中闪红，颜色变化要自然连续
+- **字体**：`SpecialElite.ttf` 在用户字体目录（`%LOCALAPPDATA%\Microsoft\Windows\Fonts\`，非工程内）→ 复制进 `Assets/Resources/Fonts/SpecialElite.ttf`；`WordLabel` 用 `Resources.Load<Font>("Fonts/SpecialElite")` 取，取不到则**警告一次并回退内置 Arial**（不会整块词条消失）
+- **威胁配色**（都在 `WordLabel`，参数序列化可调）：
+  - 危险度 = 怪物根节点到相机的**三维距离**：`farDistance` 9 m 以外 → 白；`dangerDistance` 3 m 以内 → 红；黄色出现在危险度 `yellowPoint` 0.6
+  - 白→黄→红两段线性插值 + **指数平滑**（`tintSmoothTime` 0.35 s，与帧率无关）→ 阶段切换是渐变不是跳色
+  - 怪物进入攻击态（`TypingTarget.IsAttacking`）→ 危险度锁 1（红）+ 正弦闪烁（`flashHz` 3.2、`flashMinBrightness` 0.35）
+  - 颜色量化为 32 级再比较，只有真的变了才重建富文本（否则每帧重建文字网格）
+  - 弱点词条（导演轨、挂在骨骼锚点上）会 `GetComponentInParent<TypingTarget>()` 找到同一只怪，同样上色；输入门等无目标词条保持白色
+- **未改的部分**：已完成字母仍为绿色（进度反馈保留），箭头仍为黄色 `#ffe066`
+- **验证**：
+  - `dotnet build Assembly-CSharp.csproj` / `Assembly-CSharp-Editor.csproj`：**0 error**（4–5 条都是原有 warning）
+  - 新增自动验收 `WordTintVerify`（菜单 `YourMovieSucks/Verify ENEMY LABEL Font + Threat Tint`）：断言字体是 Special Elite、9.5/6/2.6 m 三段颜色（白/黄/红）、单帧最大跳变 < 0.2（连续性）、攻击中亮度起伏 > 0.2 且始终红；抓 4 张图到 `Library/Locus/tmp/tint-shots/`。**待编辑器重开后再跑**
+- **What broke**：无（编辑器在本次会话中途被关闭，运行期验证顺延）
+- **时间**：约 40 分钟

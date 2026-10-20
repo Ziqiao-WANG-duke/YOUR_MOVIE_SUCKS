@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using YourMovieSucks.Input;
+using YourMovieSucks.Combat;
 using YourMovieSucks.LabB;
 using YourMovieSucks.Typing;
 
@@ -10,6 +10,11 @@ namespace YourMovieSucks.UI
     /// 怪物头顶词条（World Space Canvas + Text）：红小写 / 蓝大写 / 绿进度。
     /// 显示保留原文空格与标点（my pole 就画 my pole），只有字母参与进度。
     /// 使用 alwaysOnTopMaterial（ZTest Always + Overlay 队列）时永远显示在最上层，不被钢管等几何挡住。
+    ///
+    /// 威胁配色（白 → 黄 → 红）：字体颜色表示这只怪有多危险，按“怪物到相机的距离”连续渐变：
+    ///   白 = 还在远处、没有危险 / 黄 = 正在逐步靠近 / 红 = 已经在攻击环上（准备攻击）；
+    ///   怪物进入攻击态时锁成红色并正弦闪烁（越快靠近 → 越红 → 越显眼）。
+    /// 颜色用指数平滑跟随目标值，所以阶段切换不会“跳色”。
     /// </summary>
     public class WordLabel : MonoBehaviour
     {
@@ -18,8 +23,13 @@ namespace YourMovieSucks.UI
         // 所以那一机制已删——现在由箭头（TextCaretArrow）指出当前待输入的位置。
         private const string DoneHex = "2bff6a";
         private const string AgentTodoHex = "ffffff";
-        private const string DirectorTodoHex = "ffffff";
         private static readonly Color ArrowColor = new Color(1f, 0.878f, 0.4f, 1f); // #ffe066
+
+        /// <summary>词条字体：导入到 Assets/Resources/Fonts/ 的打字机字体（作者安装的 Special Elite）；没导入就退回内置 Arial。</summary>
+        private const string LabelFontResourcePath = "Fonts/SpecialElite";
+
+        /// <summary>威胁色阶的量化级数（每通道）：既保证过渡看不出来，又不会每帧重建文字网格。</summary>
+        private const int TintSteps = 32;
 
         private TypingWord _word;
         private Transform _follow;
@@ -29,6 +39,59 @@ namespace YourMovieSucks.UI
         private int _lastProgress = -1;
         private Vector3 _baseScale = new Vector3(0.005f, 0.005f, 0.005f);
         private Image _arrow;
+
+        [Header("字体")]
+        [Tooltip("字号（Special Elite 与 Arial 的字宽/字高不同，换字体后可能需要重调）")]
+        [SerializeField] private int fontSize = 44;
+
+        [Header("威胁配色（白 → 黄 → 红）")]
+        [Tooltip("远处（毫无危险）的字体颜色")]
+        [SerializeField] private Color farTintColor = new Color(1f, 1f, 1f, 1f);
+
+        [Tooltip("正在逐步靠近时的字体颜色（黄色）")]
+        [SerializeField] private Color approachTintColor = new Color(1f, 0.82f, 0.16f, 1f);
+
+        [Tooltip("已经在攻击环上、准备攻击的字体颜色（红色）")]
+        [SerializeField] private Color dangerTintColor = new Color(1f, 0.16f, 0.12f, 1f);
+
+        [Tooltip("怪物到这个三维距离（米）以外 = 纯白。实测刷怪点离 WP2 相机约 8.2–8.6 m、攻击环约 2.4 m")]
+        [SerializeField] private float farDistance = 9f;
+
+        [Tooltip("怪物进到这个三维距离（米）= 纯红，之后进入攻击态就只闪不变色")]
+        [SerializeField] private float dangerDistance = 3f;
+
+        [Tooltip("黄色出现在危险度的哪个位置（0=刚离开白、1=已到红）")]
+        [Range(0.1f, 0.9f)]
+        [SerializeField] private float yellowPoint = 0.6f;
+
+        [Tooltip("颜色过渡的指数平滑时间常数（秒）：越大越柔、越慢")]
+        [SerializeField] private float tintSmoothTime = 0.35f;
+
+        [Header("攻击中闪烁")]
+        [Tooltip("闪烁频率（次/秒）")]
+        [SerializeField] private float flashHz = 3.2f;
+
+        [Tooltip("闪烁最暗时的亮度比例（1 = 不闪）")]
+        [Range(0f, 1f)]
+        [SerializeField] private float flashMinBrightness = 0.35f;
+
+        /// <summary>当前实际使用的威胁色（未打字母的颜色，含闪烁）。供自动验收读取。</summary>
+        public Color ThreatTint { get; private set; } = Color.white;
+
+        /// <summary>当前写进富文本的量化颜色（十六进制）。</summary>
+        public string ThreatTintHex => _tintHex;
+
+        private static Font _cachedFont;
+        private static bool _fontResolved;
+
+        /// <summary>这只词条所属的怪物（能拿到才有威胁配色；输入门/无目标词条没有）。</summary>
+        private TypingTarget _threatTarget;
+
+        /// <summary>平滑后的危险度 0（远）..1（已经在攻击环上）。</summary>
+        private float _threat;
+
+        /// <summary>当前实际写进富文本的未打字母颜色（量化过的十六进制）。</summary>
+        private string _tintHex = AgentTodoHex;
 
         /// <summary>找不到 Renderer 时的兵底高度（旧行为）。</summary>
         private const float DefaultLabelHeight = 1.7f;
@@ -65,7 +128,7 @@ namespace YourMovieSucks.UI
             textGo.transform.SetParent(transform, false);
             _text = textGo.GetComponent<Text>();
 
-            var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var font = ResolveLabelFont();
             if (font != null) _text.font = font;
 
             // ZTest Always + Overlay 队列：词条永远画在场景几何（钢管）与血浆层之上
@@ -78,7 +141,7 @@ namespace YourMovieSucks.UI
             shadow.effectDistance = new Vector2(1f, -1f);
             shadow.useGraphicAlpha = true;
 
-            _text.fontSize = 44;
+            _text.fontSize = fontSize;
             _text.alignment = TextAnchor.MiddleCenter;
             _text.raycastTarget = false;
             _text.horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -112,6 +175,10 @@ namespace YourMovieSucks.UI
 
             Refresh();
             _lastProgress = _word.Progress;
+
+            // 弱点词条的目标是骨骼上的锚点，所以向上找；找不到就没有威胁配色（例如输入门）
+            _threatTarget = word.Target != null ? word.Target.GetComponentInParent<TypingTarget>() : null;
+            _threat = _threatTarget != null ? ResolveDistanceThreat() : 0f;   // 出生瞬间直接用真实值，不从白色起步
         }
 
         private void LateUpdate()
@@ -138,6 +205,80 @@ namespace YourMovieSucks.UI
                 _lastProgress = _word.Progress;
                 Refresh();
             }
+
+            UpdateThreatTint(Time.deltaTime);
+        }
+
+        /// <summary>
+        /// 威胁配色：把“离相机多远 + 是否在攻击”化成一条连续色阶，用指数平滑跟随，避免跳色。
+        /// 只有量化后的颜色真的变了才重建文字（否则每帧重建富文本会很浪费）。
+        /// </summary>
+        private void UpdateThreatTint(float deltaTime)
+        {
+            if (_threatTarget == null || _text == null) return;
+
+            float target = ResolveDistanceThreat();
+            if (_threatTarget.IsAttacking) target = 1f;   // 攻击态一律最危险（红色），具体由闪烁表达
+
+            // 指数平滑：与帧率无关，阶段切换看起来是渐变而不是跳变
+            float k = 1f - Mathf.Exp(-deltaTime / Mathf.Max(0.01f, tintSmoothTime));
+            _threat = Mathf.Lerp(_threat, target, k);
+
+            float yellow = Mathf.Clamp(yellowPoint, 0.0001f, 0.9999f);
+            Color tint = _threat < yellow
+                ? Color.Lerp(farTintColor, approachTintColor, _threat / yellow)
+                : Color.Lerp(approachTintColor, dangerTintColor, (_threat - yellow) / (1f - yellow));
+
+            if (_threatTarget.IsAttacking)
+            {
+                float pulse = 0.5f + 0.5f * Mathf.Sin(Time.time * Mathf.PI * 2f * flashHz);
+                float brightness = Mathf.Lerp(flashMinBrightness, 1f, pulse);
+                tint = new Color(tint.r * brightness, tint.g * brightness, tint.b * brightness, tint.a);
+            }
+
+            string hex = ToQuantizedHex(tint);
+            ThreatTint = tint;
+            if (hex == _tintHex) return;
+
+            _tintHex = hex;
+            Refresh();
+        }
+
+        /// <summary>危险度：远处 0、攻击环处 1（用怪物到相机的三维距离，怪走近是一条连续曲线）。</summary>
+        private float ResolveDistanceThreat()
+        {
+            if (_threatTarget == null) return 0f;
+
+            var cam = Camera.main;
+            if (cam == null) return 0f;
+
+            float distance = Vector3.Distance(_threatTarget.transform.position, cam.transform.position);
+            return Mathf.Clamp01(Mathf.InverseLerp(farDistance, dangerDistance, distance));
+        }
+
+        /// <summary>量化成十六进制（TintSteps 级）：颜色变化看不出来，但重建次数掉到十几分之一。</summary>
+        private static string ToQuantizedHex(Color color)
+        {
+            int r = Mathf.RoundToInt(Mathf.Clamp01(color.r) * (TintSteps - 1)) * 255 / (TintSteps - 1);
+            int g = Mathf.RoundToInt(Mathf.Clamp01(color.g) * (TintSteps - 1)) * 255 / (TintSteps - 1);
+            int b = Mathf.RoundToInt(Mathf.Clamp01(color.b) * (TintSteps - 1)) * 255 / (TintSteps - 1);
+
+            return r.ToString("X2") + g.ToString("X2") + b.ToString("X2");
+        }
+
+        /// <summary>词条字体：优先用导入的 Special Elite，没导入就退回内置 Arial（并只警告一次）。</summary>
+        private static Font ResolveLabelFont()
+        {
+            if (!_fontResolved || _cachedFont == null)
+            {
+                _fontResolved = true;
+                _cachedFont = Resources.Load<Font>(LabelFontResourcePath);
+
+                if (_cachedFont == null)
+                    Debug.LogWarning($"[WordLabel] 没找到字体 Resources/{LabelFontResourcePath}（.ttf 是否已导入？），词条回退内置 Arial");
+            }
+
+            return _cachedFont != null ? _cachedFont : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         }
 
         /// <summary>
@@ -212,8 +353,9 @@ namespace YourMovieSucks.UI
         {
             if (_text == null || _word == null) return;
 
-            // 未打字母全部同色（不再把“当前”单独染色），位置信息交给箭头
-            string todoHex = _word.Track == CharacterTrack.Agent ? AgentTodoHex : DirectorTodoHex;
+            // 未打字母全部同色（不再把“当前”单独染色），位置信息交给箭头；
+            // 威胁配色接管未打字母：白（远）→ 黄（靠近）→ 红（要打你了），攻击时闪烁
+            string todoHex = _tintHex;
             _text.text = _word.BuildDisplayRichText(DoneHex, todoHex, todoHex);
         }
 
