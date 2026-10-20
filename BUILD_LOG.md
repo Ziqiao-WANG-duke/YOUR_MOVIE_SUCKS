@@ -428,3 +428,23 @@
   - 新增自动验收 `WordTintVerify`（菜单 `YourMovieSucks/Verify ENEMY LABEL Font + Threat Tint`）：断言字体是 Special Elite、9.5/6/2.6 m 三段颜色（白/黄/红）、单帧最大跳变 < 0.2（连续性）、攻击中亮度起伏 > 0.2 且始终红；抓 4 张图到 `Library/Locus/tmp/tint-shots/`。**待编辑器重开后再跑**
 - **What broke**：无（编辑器在本次会话中途被关闭，运行期验证顺延）
 - **时间**：约 40 分钟
+
+## Oct 20 — 会话 29：移除弱点特写（战斗中不动镜头）+ 词条字体/威胁配色验收
+
+- **工具**：Locus（编辑器已连，全程 live 验证）
+- **Prompt that mattered**：切换成导演角色后打完弱点单词，镜头会推近聚焦弱点再回位 —— 请移除这个设计，不要在战斗中做干扰玩家的镜头动作
+- **移除的镜头设计（整体删除，不是关掉开关）**：
+  - `DirectorWeaknessView` 不再持 `closeUp` 字段、识别后只做「标记已识别 + 换词」，一行不动镜头
+  - 删除 `Assets/Scripts/Level/WeakPointCloseUpCamera.cs`（+ `.meta`），场景里 Main Camera 上的该组件已移除并保存（`Camera` 上只剩 Transform/Camera/AudioListener/CameraShake）
+  - 场景生成器与丧尸接线工具里「把特写挂到相机并接线」的两处代码都删掉，重建场景不会再加回来
+  - 上次为防「特写把相机推到怪脸前→怪物误判到站→原地开打」而加的 `TypingTarget.SpotlightHold` 定格逻辑**一并删除**（镜头不再被接管，这条路径不存在了）
+- **顺带完成的上一轮验收**（上次编辑器被关，没能跑）：
+  - `WordTintVerify`（菜单 `YourMovieSucks/Verify ENEMY LABEL Font + Threat Tint`）→ **9 pass / 0 fail**：字体 = SpecialElite（`Assets/Resources/Fonts/SpecialElite.ttf` 已导入为动态字体）、9.5 m 纯白 (1,1,1)、6 m 黄 (1,0.86,0.33)、2.6 m 红 (1,0.19,0.12)、单帧最大跳变 0.007（连续）、攻击中亮度 0.35–1.00 起伏（闪烁）；截图 4 张 `Library/Locus/tmp/tint-shots/`
+  - 修掉验收脚本自身一个 bug：逐帧采样只接了 `_sampling`、没接 `_flashSampling`，导致闪烁项「0 帧采样」白通过 → 改成两者都采，并给另一条断言加「采样数 > 0」前置
+- **弱点评测**（`WeaknessFlowVerify`，断言随之更新）：**16 pass / 0 fail**
+  - 新增回归断言「识别弱点不移动相机（位移 **0.00 m**）」
+  - 保留「识别后怪物仍在走向玩家（离相机 7.13 m，state=Approaching）」
+  - 删掉两条随特写一起失效的断言（镜头推到弱点 / 特写后解除定格）
+- **文档**：`GDD.md` 与设计源 §16 删掉「镜头特写」「特写期间定格」两段，改成「识别弱点全程不动镜头」，断言数 17→16；memory `user-preference.md` 记下「战斗中不做镜头动作」
+- **What broke**：无（验收脚本那个采样 bug 已修）
+- **时间**：约 50 分钟

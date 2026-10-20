@@ -10,9 +10,10 @@ namespace YourMovieSucks.Combat
     /// 导演轨「弱点识别」编排（第一版：单只怪的完整闭环，多只怪各自独立、同时最多 5 只）：
     ///
     ///   切到导演轨 → 场上未识别的怪亮红光 + 挂上弱点词（大写、走现有打字判定，**不需要额外的 ZOOM 指令**）
-    ///   输入弱点词 → 标记这只怪已识别 → 镜头快速推进到弱点播短暂特写
-    ///                → 把这只怪的战斗词换成更简单的词（首字母冲突时排队等空位，绝不产生吸附歧义）
+    ///   输入弱点词 → 标记这只怪已识别 → 把这只怪的战斗词换成更简单的词（首字母冲突时排队等空位，绝不产生吸附歧义）
     ///   切回特工轨 → 只看得见（新的）战斗词
+    ///
+    /// **刻意不做镜头动作**：识别弱点不推近、不晃、不改变构图（作者 2026-10-20：战斗中任何镜头动作都是在干扰玩家）。
     ///
     /// 不做的事：识别不击杀怪物、不改攻击/伤害/结算、不加新的导演技能。
     /// 两轨显示不同信息：词条标签按轨道显隐（WordLabelManager），这里只负责弱点词的生成/回收。
@@ -21,7 +22,6 @@ namespace YourMovieSucks.Combat
     {
         [SerializeField] private TypingController typing;
         [SerializeField] private TrackInput trackInput;
-        [SerializeField] private WeakPointCloseUpCamera closeUp;
 
         [Tooltip("弱点词条相对弱点锚点的固定高度偏移（米）")]
         [SerializeField] private float weaknessLabelOffsetY = 0.3f;
@@ -34,7 +34,6 @@ namespace YourMovieSucks.Combat
         {
             if (typing == null) typing = Object.FindFirstObjectByType<TypingController>();
             if (trackInput == null) trackInput = Object.FindFirstObjectByType<TrackInput>();
-            if (closeUp == null) closeUp = Object.FindFirstObjectByType<WeakPointCloseUpCamera>();
 
             if (typing == null) return;
             typing.OnWordCompleted += HandleWordCompleted;
@@ -121,20 +120,7 @@ namespace YourMovieSucks.Combat
 
             weakness.MarkRecognized();
 
-            // 特写期间把怪物定格（SpotlightHold）：镜头会被挪到怪物脸前，
-            // 而“到站开打”是拿怪物到相机的距离判断的 —— 不定格就会在特写里误判已到达，
-            // 停在原地开打（离玩家还很远），且 _arrived 会 latch 住，镜头回位后也不再走过去。
-            // 镜头回位回调里再解除，所以无论特写是否真的播（轨道镜头在推就跳过）一定会恢复。
-            var target = weakness.GetComponent<TypingTarget>();
-            if (closeUp != null && target != null)
-            {
-                target.SpotlightHold = true;
-                closeUp.Play(weakness.WeakPoint, () =>
-                {
-                    if (target != null) target.SpotlightHold = false;
-                });
-            }
-
+            // 这里刻意不动镜头（作者 2026-10-20：战斗中的镜头动作会干扰玩家）
             TrySwapCombatWord(weakness);
         }
 

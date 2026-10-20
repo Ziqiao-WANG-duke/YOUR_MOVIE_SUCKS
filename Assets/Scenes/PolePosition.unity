@@ -618,7 +618,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Combat.DirectorWeaknessView
   typing: {fileID: 28838331}
   trackInput: {fileID: 28838330}
-  closeUp: {fileID: 890624407}
+  closeUp: {fileID: 0}
   weaknessLabelOffsetY: 0.3
 --- !u!1 &40096531
 GameObject:
@@ -2195,7 +2195,6 @@ GameObject:
   - component: {fileID: 890624404}
   - component: {fileID: 890624405}
   - component: {fileID: 890624403}
-  - component: {fileID: 890624407}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2292,25 +2291,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 402438572}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &890624407
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 890624402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca81c407ed7894d43ab66ce9169a31c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Level.WeakPointCloseUpCamera
-  targetCamera: {fileID: 890624404}
-  rail: {fileID: 1622966593}
-  distance: 0.9
-  heightBias: 0.12
-  pushDuration: 0.18
-  holdDuration: 0.5
-  returnDuration: 0.28
 --- !u!1 &985568900
 GameObject:
   m_ObjectHideFlags: 0

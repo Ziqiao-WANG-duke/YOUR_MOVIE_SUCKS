@@ -575,19 +575,9 @@ namespace YourMovieSucks.EditorTools
                 }
             }
 
-            // 导演轨弱点识别接线：相机上挂特写，Systems 上挂编排视图，词条管理器接 TrackInput（按轨显隐）
-            var cameraGo = Camera.main != null ? Camera.main.gameObject : FindInScene("Main Camera");
+            // 导演轨弱点识别接线：Systems 上挂编排视图，词条管理器接 TrackInput（按轨显隐）。
+            // 不接镜头：弱点识别刻意不做任何镜头动作（作者 2026-10-20）
             var systems = FindInScene("Systems");
-
-            if (cameraGo != null)
-            {
-                var closeUp = cameraGo.GetComponent<Level.WeakPointCloseUpCamera>();
-                if (closeUp == null) closeUp = cameraGo.AddComponent<Level.WeakPointCloseUpCamera>();
-                var closeUpSo = new SerializedObject(closeUp);
-                SetProperty(closeUpSo, "targetCamera", p => p.objectReferenceValue = cameraGo.GetComponent<Camera>());
-                SetProperty(closeUpSo, "rail", p => p.objectReferenceValue = Object.FindFirstObjectByType<Level.RailCameraController>());
-                closeUpSo.ApplyModifiedPropertiesWithoutUndo();
-            }
 
             if (systems != null)
             {
@@ -596,7 +586,6 @@ namespace YourMovieSucks.EditorTools
                 var viewSo = new SerializedObject(view);
                 SetProperty(viewSo, "typing", p => p.objectReferenceValue = Object.FindFirstObjectByType<Typing.TypingController>());
                 SetProperty(viewSo, "trackInput", p => p.objectReferenceValue = Object.FindFirstObjectByType<Input.TrackInput>());
-                SetProperty(viewSo, "closeUp", p => p.objectReferenceValue = cameraGo != null ? cameraGo.GetComponent<Level.WeakPointCloseUpCamera>() : null);
                 viewSo.ApplyModifiedPropertiesWithoutUndo();
             }
 

@@ -91,7 +91,7 @@ namespace YourMovieSucks.EditorTools
                 return;
             }
 
-            if (_sampling) SampleFrame();
+            if (_sampling || _flashSampling) SampleFrame();
             if (Time.realtimeSinceStartup < _wait) return;
 
             switch (_step)
@@ -232,7 +232,8 @@ namespace YourMovieSucks.EditorTools
             float spread = _flashMax - _flashMin;
             Check($"攻击中在红色底子上闪烁（亮度 {_flashMin:0.00}–{_flashMax:0.00}，起伏 {spread:0.00}，采样 {_flashSamples} 帧）",
                 _flashSamples >= 10 && spread > 0.2f);
-            Check($"攻击中始终是红色（最亮时绿色通道 {_flashGreenMax:0.00} < 0.4）", _flashGreenMax < 0.4f);
+            Check($"攻击中始终是红色（采样 {_flashSamples} 帧，最亮时绿色通道 {_flashGreenMax:0.00} < 0.4）",
+                _flashSamples > 0 && _flashGreenMax < 0.4f);
 
             Capture("04_attacking_flash");
 
