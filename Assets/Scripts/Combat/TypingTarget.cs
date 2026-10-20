@@ -80,6 +80,15 @@ namespace YourMovieSucks.Combat
         /// <summary>演出定格：入场/抱杆演出期间由演出层置位，怪物不走不动不攻击（仍可被打字击杀）。</summary>
         public bool Frozen { get; set; }
 
+        /// <summary>
+        /// 特写定格：镜头被演出层短暂接管（弱点特写）期间置位 —— 不走、不判断到站、不请求攻击。
+        /// 为什么必须定格：站位点是拿**相机**当玩家算出来的（距相机 attackRange）；特写会把相机挪到怪物脸前，
+        /// 间距瞬间缩到 1 m 级，不解定格就会误判“已经走到玩家身边”，于是停在离玩家还很远的地方直接开打，
+        /// 而且 _arrived 一旦置位，只要还在 attackRange×3 内就不会解除 —— 镜头回位后它也不走了。
+        /// 与 Frozen 分开是因为两者归属不同演出层，互不覆盖。
+        /// </summary>
+        public bool SpotlightHold { get; set; }
+
         public event System.Action OnDeath;
         public event System.Action OnAttackHit;
         public event System.Action OnAttackStart;
@@ -105,7 +114,7 @@ namespace YourMovieSucks.Combat
 
         private void Update()
         {
-            if (IsDead || _player == null || Frozen) return;
+            if (IsDead || _player == null || Frozen || SpotlightHold) return;
 
             // 控场计时
             if (_slowTimer > 0f)

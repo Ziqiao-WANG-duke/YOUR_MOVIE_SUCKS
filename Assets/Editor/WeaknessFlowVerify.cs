@@ -217,15 +217,23 @@ namespace YourMovieSucks.EditorTools
 
             Check("弱点标记已隐藏", _weakness.WeakPoint.Find("WeakPointMarker") == null || !_weakness.WeakPoint.Find("WeakPointMarker").gameObject.activeSelf);
 
+            // 回归：特写把相机挪到怪物脸前，而“到站”看的是到相机的距离 —— 怪物不能因此原地开打
+            Check("特写期间怪物没有误判到站（未进入攻击态）", !_monster.IsAttacking);
+
             _track.ForceTrack(CharacterTrack.Agent);
             _step = 5;
-            Next();
+            Next(1.2f);   // 等特写播完（推 0.18 + 保持 0.5 + 回位 0.28），才能检查定格是否解除
         }
 
         private static void BackToAgent()
         {
             Check("切回特工轨后，新战斗词标签可见", LabelActive("WordLabel_" + _simplifiedMatch, true));
             Capture("03_agent_view_simplified_word");
+
+            // 回归：镜头回位后怪物必须还在走向玩家，不能停在原地（离玩家很远）开打
+            float toCamera = Vector3.Distance(_monster.transform.position, Camera.main.transform.position);
+            Check($"特写结束后怪物解除定格、继续走向玩家（离相机 {toCamera:0.00} m，state={_monster.State}）",
+                !_monster.SpotlightHold && !_monster.IsAttacking && toCamera > 2f);
 
             int weaknessWords = 0;
             foreach (var word in _typing.Words) if (word != null && word.IsWeakness) weaknessWords++;

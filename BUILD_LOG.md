@@ -391,3 +391,22 @@
   - 原有 F2 自检 **29 pass / 2 fail**（两条仍是已知无头帧率问题），`no two active words ever shared the same initial letter` 通过、`accuracy=100% words=12 kills=12`
 - **What broke**：无（除上述两个已修问题）
 - **时间**：约 3 小时
+
+## Oct 20 — 会话 27：修复「识别弱点后怪物原地开打」
+
+- **工具**：Locus（编辑器连接中；改动后热编译 + 编辑器内跑两套自检，不退出 Unity）
+- **Prompt that mattered**：使用导演敌人输入完弱点单词后，怪物会停留在当前位置直接攻击，而不是走到离玩家的最近位置再开始攻击，请修复
+- **根因**：怪物的「到站开打」是拿**怪物到相机的距离**判定的（站位点 = 相机前方 `attackRange` 处的攻击环），而弱点特写会把相机挪到怪物脸前 —— 特写期间间距瞬间缩到 1 m 级，于是一路加速中的怪（打错字母 1.6 m/s）在特写里撞进那个“假攻击环”，`_arrived` 置位并**latch 住**（只有离相机超过 `attackRange×3` 才解除）→ 镜头回位后它停在原地、离玩家还很远就开始攻击
+  - 现场复现（不进编辑器界面的自动对照）：加速怪 + 只播特写不定格 → `t+0.72s state=Attacking arrived=True pos=(-2.81, 8.25) dCam=3.53`（比修复前的位置还往后退了 0.2 m）；同条件下定格 → 特写期间位置不动，结束走到攻击环 `dCam=2.47` 才开打
+- **修复**：
+  - `TypingTarget` 新增 `SpotlightHold`（与入场演出的 `Frozen` 分开，互不覆盖）：置位时**不走、不判断到站、不请求攻击**（`Update` 开头一并 return）
+  - `WeakPointCloseUpCamera.Play(focus, onFinished)` 增加回调：**任何出口都必回调一次**（正在播/轨道在推/播完），调用方拿它解除定格，漏调就会把怪定死
+  - `DirectorWeaknessView` 识别时置 `SpotlightHold = true` 并在回调里解除
+  - 顺带修掉一个观感问题：特写期间怪不再朝镜头走（以前会一路走向相机/穿过镜头）
+- **验证**：
+  - `YourMovieSucks/Verify DIRECTOR WEAKNESS Flow` → **17 pass / 0 fail**（新增两条回归断言：特写期间未进入攻击态；特写结束后解除定格、继续走向玩家 7.18 m）
+  - 原有 F2 自带自检（编辑器内跑，`exitWhenFinished=false`）→ **31 pass / 0 fail**（本次 0 失败；`no two active words…`、`accuracy=100% words=12 kills=12`、`player survived` 全通过）
+  - A/B 对照数据见上（先在 live 里复现 bug，再验证修复）
+- **文档**：`GDD.md` / 设计源 §16 补「特写期间怪物定格」与新的 17 项断言
+- **What broke**：无
+- **时间**：约 1 小时

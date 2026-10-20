@@ -121,7 +121,19 @@ namespace YourMovieSucks.Combat
 
             weakness.MarkRecognized();
 
-            if (closeUp != null) closeUp.Play(weakness.WeakPoint);
+            // 特写期间把怪物定格（SpotlightHold）：镜头会被挪到怪物脸前，
+            // 而“到站开打”是拿怪物到相机的距离判断的 —— 不定格就会在特写里误判已到达，
+            // 停在原地开打（离玩家还很远），且 _arrived 会 latch 住，镜头回位后也不再走过去。
+            // 镜头回位回调里再解除，所以无论特写是否真的播（轨道镜头在推就跳过）一定会恢复。
+            var target = weakness.GetComponent<TypingTarget>();
+            if (closeUp != null && target != null)
+            {
+                target.SpotlightHold = true;
+                closeUp.Play(weakness.WeakPoint, () =>
+                {
+                    if (target != null) target.SpotlightHold = false;
+                });
+            }
 
             TrySwapCombatWord(weakness);
         }

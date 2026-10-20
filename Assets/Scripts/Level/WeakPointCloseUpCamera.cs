@@ -36,20 +36,32 @@ namespace YourMovieSucks.Level
             if (rail == null) rail = Object.FindFirstObjectByType<RailCameraController>();
         }
 
-        /// <summary>播一次弱点特写；轨道镜头正在推进或已在播时忽略。</summary>
-        public void Play(Transform focus)
+        /// <summary>
+        /// 播一次弱点特写；轨道镜头正在推进或已在播时放弃本次特写（放弃时也会回调 onFinished）。
+        /// onFinished 一定会被回调一次 —— 调用方拿它恢复“特写期间定格”的怪物状态，漏调就会把怪定死。
+        /// </summary>
+        public void Play(Transform focus, System.Action onFinished = null)
         {
-            if (IsPlaying || focus == null || targetCamera == null) return;
-            // 只有“启用中的轨道镜头正在推进”才算冲突；它被禁用时不会写位置，可以安全接管
-            if (RailOwnsCamera()) return;
+            if (IsPlaying || focus == null || targetCamera == null)
+            {
+                onFinished?.Invoke();
+                return;
+            }
 
-            StartCoroutine(Run(focus));
+            // 只有“启用中的轨道镜头正在推进”才算冲突；它被禁用时不会写位置，可以安全接管
+            if (RailOwnsCamera())
+            {
+                onFinished?.Invoke();
+                return;
+            }
+
+            StartCoroutine(Run(focus, onFinished));
         }
 
         private bool RailOwnsCamera()
             => rail != null && rail.isActiveAndEnabled && rail.IsMoving;
 
-        private IEnumerator Run(Transform focus)
+        private IEnumerator Run(Transform focus, System.Action onFinished)
         {
             IsPlaying = true;
 
@@ -102,6 +114,8 @@ namespace YourMovieSucks.Level
 
             cameraTransform.SetPositionAndRotation(fromPosition, fromRotation);
             IsPlaying = false;
+
+            onFinished?.Invoke();
         }
     }
 }
