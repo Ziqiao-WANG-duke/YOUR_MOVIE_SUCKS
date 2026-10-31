@@ -1,101 +1,37 @@
-# STYLE GUIDE —《YOUR MOVIE SUCKS!》Lab C
+# YOUR MOVIE SUCKS! — Art & Audio Style Guide (Lab C)
+**Track:** 3D · **Engine:** Unity 6000.3.8f1 · **Rendering:** URP 17.3.0 · **Platform:** Windows x64
 
-> 本文件是 Lab C 的 Stage 0 交付物：轨道声明 + 美术风格指南 + 音乐 brief + 配音 brief。
-> 一切资产「能不能留下」都以本文件为判据（见 §6 验收清单）。
-> 事实来源：`GDD.md`、`BUILD_LOG.md`、工程内实际资产与参数。
+## Creative direction
+A first-person typing-based zombie shooter set in an underground strip club, referencing *The Typing of the Dead: Overkill* and the atmosphere of 1990s arcade horror such as *The House of the Dead*. The broader tone combines intentionally exaggerated B-movie performances, dark comedy, neon nightclub lighting and imperfect low-resolution 3D.
 
----
+**Visual pillars:** (1) readable monsters and words at gameplay distance; (2) low-detail PS1-inspired geometry, distorted textures and controlled vertex snapping; (3) dramatic pink/cyan nightclub lighting, dark interiors and conspicuous practical stage fixtures; (4) lurid grindhouse blood and film aesthetics rather than realistic high-fidelity imagery.
 
-## 1. 轨道声明（Track）
+## Asset production
+- **Two enemy focus assets:** Bartender Zombie and Bikini Zombie. Gemini generated front/side/back turnaround imagery from references supplied by the creator; Tripo 3D generated the corresponding meshes. A third Gemini/Tripo asset is the pole-dance stage.
+- The player is represented by a first-person camera, not a visible character model. The two enemies demonstrate the art pipeline, although this substitutes for the assignment's literal player + enemy specification.
+- Generated character textures were either used substantially as produced or touched up in Substance 3D Painter. Some environment textures were processed manually in Photoshop. No Substance Painter before/after screenshot was retained.
+- Mixamo auto-rigging and zombie animation assets were used for both enemies. Runtime locomotion and states were integrated in Unity.
+- PS1 rendering came from a creator-directed pipeline: study of historical effects, consultation with a technical-art instructor, ChatGPT prompt specification, Astra shader code, and creator review. The first test prioritized vertex jitter/snapping and affine-like texture distortion on world objects, not UI.
+- The environment was initially built with a coding agent, then manually adjusted for brightness, lighting, textures, and a more specific stage look.
 
-**3D track。**
+## UI and VFX
+Special Elite typewriter typography; contrasting Agent and Director modes; clear readable typing targets; film-strip health indicators with full/empty variants; camera framing and monochrome film effects in Director mode. AI-assisted UI concepts were cleaned in Photoshop and integrated with a Unity HUD editor. Its preview-to-game canvas scale mismatch required several corrective iterations.
 
-游戏是 3D 场景 + 骨骼蒙皮敌人 + URP 光照/后期，不适用 2D 轨。对应管线阶段：
+Blood splatter, claw marks and other screen-space feedback support combat readability. The repository describes VFX enable/disable controls; the final game build must still be checked to ensure **three key-moment effects** are switchable.
 
-| # | 阶段 | 主要产物 |
-|---|---|---|
-| 0 | Art direction | 本文件、渲染与色彩规范 |
-| 1 | Concept art + turnaround | 敌人与场景概念（见 §7 待补清单） |
-| 2 | Modeling | 敌人网格（外部包）+ 场景构件（引擎内自制） |
-| 3 | Texturing | 敌人贴图与调色、场景材质 |
-| 4 | Rigging | Humanoid 骨骼绑定与导入设置 |
-| 5 | Animation | 待机 / 奔跑 / 攻击 / 死亡 动画集 |
-| 共享 | Environment · UI · VFX · Lighting · Integration | 见 §4–§5 |
+## Sound and music direction
+House music was chosen for the nightclub environment; B-movie cinema supplied the broader dramatic reference. Typing, gunfire and impact sounds were sourced from free-access online resources rather than AI generation. Exact original download URLs and licenses have not been recovered. The current soundtrack is a complete commercially released song, approximately four minutes long, not a cleared 30–90-second gameplay loop. Its use and public redistribution have not been licensed or verified; the creator has chosen to retain it in this interim coursework build. This is a **known unresolved issue**, not an assertion of permission.
 
-**Hero assets（走完每一阶段）**
-1. **Player** —— 本作是「第一人称摄影机 + 打字武器」的动作打字游戏，玩家没有可见的身体模型。取舍与理由见 `PIPELINE_REPORT.md` §5。Stage 1–5 的等价产物是：机位/运镜设计、取景框与镜头语言、注视点（pole anchor）与打击反馈。
-2. **主要威胁：StripperZombie（变异舞女丧尸）** —— 骨骼网格 + 12 段动画 + 弱点部位（头/腿/颈/肩/嘴）。
-   第二敌人 **Zombie_Waiter（侍者丧尸）** 复用同一套骨架管线，换网格与贴图，作为「同一制作流程可复制」的证据。
+## Voice direction
+A friend volunteered to perform the Agent and Director voices. Agent: blunt, impatient, short phrases. Director: theatrical, self-important, amused by cinematic disasters. Repository documentation identifies thirteen scripted lines integrated with subtitles and ten additional reaction-line files not yet triggered. Actor consent, credit and permission to redistribute recordings should be confirmed.
 
----
+## Acceptance checks
+1. Words and enemy silhouettes remain readable during effects and under strong lighting.
+2. World-space distortion never affects UI legibility.
+3. Character animations are correctly skinned; no T-pose or disruptive root-motion drift.
+4. HUD placement matches actual game resolution; blood overlays do not obscure key typing information.
+5. Audio cues and captions match their triggers, with mute control confirmed in the delivered build.
+6. Every incorporated third-party or AI asset has source, plan, rights and use status tracked in `ASSET_LOG.md`.
 
-## 2. 视觉支柱（Visual pillars）
-
-1. **70s Grindhouse 磨房电影**：番茄酱血浆、失焦的霓虹、廉价冲印感、片场元叙事。
-2. **PS1 / 16mm 模拟质感**：低分辨率合成 + 抖动 + 颗粒 + 划痕 + 暗角，一切「脏」都要是**受控的脏**。
-3. **可读性优先**：打字游戏的第一资产是「词」。任何美术手段不允许降低词条在游戏尺寸下的可读性。
-
-## 3. 渲染与色彩规范（可执行参数）
-
-实现在 `Assets/RetroRendering/`（合成材质 `RetroRendering/ScreenComposite`）与 `Assets/Art/Shaders/`：
-
-| 项 | 规范 |
-|---|---|
-| 管线 | URP 17（Forward+），Retro 合成 pass 在渲染末端 |
-| 内部分辨率 | 低分辨率渲染后最近邻放大（像素颗粒必须可见） |
-| 抖动 | Bayer/4×4 有序抖动，禁止平滑渐变过渡到纯色 |
-| 胶片 | 颗粒 0.35、曝光闪烁 0.25 / 14 Hz、暗角 0.55、竖向条纹 0.35、划痕 0.45 |
-| 导演轨滤镜 | 黑白：对比 1.9、抬黑 0.03、亮度 1.35、黑位 0.10（`DirectorFilmFilter`） |
-| 主色 | 霓虹粉紫 `#FF66D9` 系、青 `#5FE6E0` 系、番茄红 `#E1261C`、暖黄 `#FFE066` |
-| 禁止 | 纯白大面积、平滑 AO 渐变、写实 PBR 高光（会破坏 16mm 质感） |
-
-## 4. UI 规范
-
-- 字体：**Special Elite**（打字机字体，`Assets/Resources/Fonts/SpecialElite.ttf`）；标题/徽章可放大加粗，正文 ≤ 34px 保证可读。
-- 词条：显示保留空格，输入不加空格/标点；**未打 = 白，已打 = 绿 `#2bff6a`**；当前待输入字母用黄色 ▼ 箭头指认，不改字色。
-- 威胁配色：远处白 → 靠近黄 → 攻击环红并正弦闪烁（连续过渡，单帧跳变 < 0.2）。
-- 血条：胶片条（9 格），满血格＝发光画面、空血格＝暗画面；不显示数字。
-- 轨道标识：AGENT = 蓝（`0.32,0.56,1`），DIRECTOR = 红（`1,0.25,0.25`），色条 + 徽章文字双编码。
-- 屏幕安全区：HUD 元素避开词条出现区（词条最高表观尺寸有上限）。
-
-## 5. 音频 brief
-
-### 5.1 音乐 brief（Music direction）
-
-| 项 | 要求 |
-|---|---|
-| 风格 | 70s 放克/迪斯科 + 廉价钢管舞俱乐部现场感，鼓组要「脏」，贝斯走根音 |
-| 情绪 | 荒诞 + 色情 + 廉价威胁；不要恐怖片配乐 |
-| 用途 | 主循环，开场黑幕起播，结算屏前停 |
-| 时长 | 作业要求 30–90s 循环；现用曲目 4:00（`bgm_show_me_love.mp3`，见 `PIPELINE_REPORT.md` §4 差距说明） |
-| 动态 | 对话时自动 duck（×0.35，2.5/s 平滑），结束恢复 |
-| 混音目标 | BGM 明显低于 SFX/VO（当前 `bgmVolume 0.22` vs `sfxVolume 0.8`） |
-
-### 5.2 配音 brief（Voice direction)
-
-| 项 | 要求 |
-|---|---|
-| 角色 | **AGENT（特工/打手）**：低、糙、不耐烦，短句；**DIRECTOR（导演/摄影）**：油滑、自恋、语速快，爱用行话 |
-| 语言 | 英语；脏话保留（分级：成人向） |
-| 长度 | 单句 0.5–2.5s，不允许压过打字节奏 |
-| 处理 | 44.1kHz / 16bit / 单声道 WAV；可变速变调（磁带感）；逐条可调延迟/起始偏移/音量 |
-| 字幕 | 每句必须有字幕；字幕在音频前 55% 时长内铺完 |
-| 触发分层 | 剧情对白（13 句，已接入）+ 反应台词（受击/低血/死亡 10 句，已录未接入，见 `docs/voice-script.md` §4） |
-
-## 6. 资产验收清单（keep / redo 的判据）
-
-一个资产可以进游戏，当且仅当：
-
-1. **风格一致**：符合 §3 的色彩与质感，不出现写实 PBR 或平滑渐变。
-2. **游戏尺寸可读**：在 1280×720 窗口、相机 2.6–9.5 m 距离下，词条与 UI 文字可读；敌人剪影可辨。
-3. **干净**：无穿插、无 T-pose、无错帧、无爆音（峰值 ≤ −3 dBFS）、循环点无咔哒。
-4. **授权清楚**：`ASSET_LOG.md` 有该资产一行，写明来源、许可、是否 AI、是否占位。
-5. **记账**：`STAGE_LOG.md` 有对应阶段条目。
-
-不满足 → 手工重做 / 换工具 / 换免费资产，并在 Stage Log 里写清为什么。
-
-## 7. 参考与待补
-
-- 现存参考（工程内）：`Assets/RetroRendering/`（合成与调色）、`Assets/Art/Shaders/`（环境/角色/UI 着色器）、`Assets/Prefabs/StripperZombie.prefab`、`Assets/Prefabs/Zombie_Waiter.prefab`、`Assets/UI/Health/`（胶片血条）、`Assets/Scene` 灯光物件。
-- `style/refs/` 放**带来源的**参考图：片场/霓虹/16mm 颗粒/字体样本/敌人 turnaround。每张图旁边写来源与用途（一张一行，`style/refs/REFS.md`）。
-- 【待补】Stage 1 概念图与 turnaround（敌人正面/侧面/背面）；若最终没有独立概念图，请在 Stage Log 里写「以引擎内 look-dev 代替，理由……」，而不是留空。
+## Production evidence
+The creator supplied three Gemini concepts, three Tripo previews, a Mixamo animation screenshot, early/current Unity screenshots, and multiple HUD iterations. The evidence currently resides in the conversation's supplied images; **image files still need copying to the repository's `style/refs/` directory** and attribution records. See `docs/LABC_VERIFIED_PROCESS.md`.
