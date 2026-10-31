@@ -25,6 +25,7 @@ namespace YourMovieSucks.EditorTools
         private const string SettingsPath = "Assets/Audio/VO/VoLineSettings_PolePosition.asset";
         private const string TypingSfxFolder = "Assets/Audio/SFX/Typing";
         private const string GunshotSfxFolder = "Assets/Audio/SFX/Gunshot";
+        private const string HurtSfxFolder = "Assets/Audio/SFX/Hurt";
 
         /// <summary>切轨键音效（不从打字候选池里选）。</summary>
         private const string SwitchSfxId = "typewriter8";
@@ -239,6 +240,7 @@ namespace YourMovieSucks.EditorTools
 
             // 打字音效：候选池扫 Assets/Audio/SFX/Typing（排除切轨音效）
             WireTypingSfx(audio);
+            WireHurtSfx(audio);
 
             // 把 id 写进场景里的四组台词数组（按文本匹配）
             int idsSet = 0;
@@ -417,6 +419,30 @@ namespace YourMovieSucks.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
 
             Debug.Log($"[VoiceTools] typing SFX pool: {ids.Count} clip(s) [switch = {SwitchSfxId}], gunshot pool: {gunshots.Count} clip(s)");
+        }
+
+        /// <summary>玩家受伤音效：建/接线 PlayerHurtSfx，候选池扫 Assets/Audio/SFX/Hurt。</summary>
+        private static void WireHurtSfx(DemoAudioDirector audio)
+        {
+            var hurt = UnityEngine.Object.FindFirstObjectByType<PlayerHurtSfx>();
+            if (hurt == null)
+            {
+                var systems = GameObject.Find("Systems");
+                var host = systems != null ? systems : new GameObject("Systems");
+                hurt = host.AddComponent<PlayerHurtSfx>();
+                Debug.Log("[VoiceTools] added PlayerHurtSfx on Systems");
+            }
+
+            var ids = ScanSfxIds(HurtSfxFolder, null);
+            var so = new SerializedObject(hurt);
+            SetObject(so, "audio", audio);
+            SetObject(so, "playerHealth", UnityEngine.Object.FindFirstObjectByType<YourMovieSucks.Combat.PlayerHealth>());
+            SetStringArray(so, "hurtSfxIds", ids);
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            Debug.Log(ids.Count > 0
+                ? $"[VoiceTools] hurt SFX pool: {ids.Count} clip(s)"
+                : "[VoiceTools] hurt SFX pool empty — PlayerHurtSfx 会使用程序生成的占位受伤音（把素材放进 Assets/Audio/SFX/Hurt 后重跑本工具即可换成真素材）");
         }
 
         /// <summary>扫目录取音频 id（文件名）；excludeId 用于把切轨音效排除出候选池。</summary>

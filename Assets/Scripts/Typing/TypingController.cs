@@ -261,7 +261,8 @@ namespace YourMovieSucks.Typing
 
         private void OnGUI()
         {
-            if (!showDebugOverlay) return;
+            // 调试面板只在编辑器/开发版里画：发给别人玩的正式包里不应该出现 ACTIVE WORDS / LOG
+            if (!showDebugOverlay || !(Application.isEditor || Debug.isDebugBuild)) return;
 
             var style = new GUIStyle(GUI.skin.label) { fontSize = 16, richText = true };
             const int x = 740;
@@ -282,7 +283,7 @@ namespace YourMovieSucks.Typing
                 done = isAgent ? done.ToLowerInvariant() : done.ToUpperInvariant();
                 todo = isAgent ? todo.ToLowerInvariant() : todo.ToUpperInvariant();
 
-                string trackHex = isAgent ? "#ff4040" : "#4080ff";
+                string trackHex = isAgent ? "#4080ff" : "#ff4040";
                 string time = word.HasTimeLimit ? $" {word.RemainingTime:0.0}s" : "";
 
                 GUI.Label(new Rect(x, y, w, 22),

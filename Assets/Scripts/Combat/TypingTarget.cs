@@ -22,7 +22,7 @@ namespace YourMovieSucks.Combat
         [SerializeField] private float rushSpeed = 1.6f;
         [SerializeField] private float attackRange = 4f;
         [SerializeField] private float attackCountdown = 1.5f;
-        [SerializeField] private float attackDamage = 35f;
+        [SerializeField] private float attackCells = 1f;
 
         [Tooltip("接近/攻击位置相对玩家的横向车道偏移（沿相机右方向，世界单位）。\n" +
                  "不同怪走不同车道，头顶词条才不会横向叠在一起；0 = 正对相机。")]
@@ -49,6 +49,35 @@ namespace YourMovieSucks.Combat
 
         /// <summary>已到达攻击站位：站住不动（镜头推进不再让它倒退）。</summary>
         private bool _arrived;
+
+        /// <summary>战斗编排资产按词长档位注入速度后置位：LabBTuning 面板不再覆盖接近/冲刺速度。</summary>
+        private bool _externalSpeeds;
+
+        /// <summary>战斗编排资产已注入伤害后置位：LabBTuning 面板不再覆盖伤害格数。</summary>
+        private bool _externalAttackCells;
+
+        /// <summary>当前接近速度（米/秒）；编辑器与自检读取实际生效值。</summary>
+        public float ApproachSpeed => baseSpeed;
+
+        /// <summary>当前冲刺速度（米/秒）。</summary>
+        public float RushSpeed => rushSpeed;
+
+        /// <summary>由战斗编排资产按档位注入行动速度；之后调参面板不再覆盖这两项。</summary>
+        public void ApplyMoveSpeeds(float approach, float rush)
+        {
+            baseSpeed = Mathf.Max(0f, approach);
+            rushSpeed = Mathf.Max(0f, rush);
+            _externalSpeeds = true;
+        }
+
+        /// <summary>由战斗编排资产注入“每次挠中的伤害格数”；之后调参面板不再覆盖它。</summary>
+        public void ApplyAttackCells(int cells)
+        {
+            attackCells = Mathf.Max(1, cells);
+            _externalAttackCells = true;
+        }
+
+        public int AttackCells => Mathf.Max(1, Mathf.RoundToInt(attackCells));
 
         /// <summary>
         /// 当前“持久”的整体缩放（被打错后放大，之后一直保持）。
@@ -126,7 +155,7 @@ namespace YourMovieSucks.Combat
                 if (_attackTimer <= 0f)
                 {
                     OnAttackHit?.Invoke();
-                    if (_playerHealth != null) _playerHealth.TakeDamage(attackDamage);
+                    if (_playerHealth != null) _playerHealth.TakeDamage(attackCells);
                     _attackTimer = attackCountdown; // 继续下一轮攻击
                     AttackLunge();
                 }
@@ -315,11 +344,14 @@ namespace YourMovieSucks.Combat
             var tuning = LabBTuning.I;
             if (tuning == null || !tuning.Enabled) return;
 
-            baseSpeed = tuning.approachSpeed;
-            rushSpeed = tuning.rushSpeed;
+            if (!_externalSpeeds)
+            {
+                baseSpeed = tuning.approachSpeed;
+                rushSpeed = tuning.rushSpeed;
+            }
             attackRange = tuning.attackRange;
             attackCountdown = tuning.attackCountdown;
-            attackDamage = tuning.attackDamage;
+            if (tuning.forceUniformAttackCells && !_externalAttackCells) attackCells = Mathf.Max(1f, tuning.attackCells);
 
             // 面板上能实时调的外观/站位参数（作业要求：Lab B 期间调过的每个数字都要在面板上）
             deathLinger = tuning.enemyDeathHold;

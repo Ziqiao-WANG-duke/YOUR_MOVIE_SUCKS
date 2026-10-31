@@ -230,13 +230,13 @@ namespace YourMovieSucks.EditorTools
         /// 弱点词池（同屏最多 5 只怪 → 5 条、首字母互不相同 → 吸附锁定永不歧义）。
         /// 部位/词/骨骼/识别后的简单词全部在这张表里，加内容只改这里。
         /// </summary>
-        private static readonly (string label, string word, string bone, string simple)[] WeaknessEntries =
+        private static readonly (string label, string word, string bone)[] WeaknessEntries =
         {
-            ("HEAD",     "HEAD",     "mixamorig:Head",         "HIT"),
-            ("LEG",      "LEG",      "mixamorig:LeftLeg",      "LIE"),
-            ("NECK",     "NECK",     "mixamorig:Neck",         "CUT"),
-            ("SHOULDER", "SHOULDER", "mixamorig:LeftShoulder", "SHUT"),
-            ("MOUTH",    "MOUTH",    "mixamorig:Head",         "EAT"),
+            ("HEAD",     "HEAD",     "mixamorig:Head"),
+            ("LEG",      "LEG",      "mixamorig:LeftLeg"),
+            ("NECK",     "NECK",     "mixamorig:Neck"),
+            ("SHOULDER", "SHOULDER", "mixamorig:LeftShoulder"),
+            ("MOUTH",    "MOUTH",    "mixamorig:Head"),
         };
 
         /// <summary>幂等创建/刷新弱点配置资产。</summary>
@@ -262,7 +262,6 @@ namespace YourMovieSucks.EditorTools
                 element.FindPropertyRelative("partLabel").stringValue = WeaknessEntries[i].label;
                 element.FindPropertyRelative("weakWord").stringValue = WeaknessEntries[i].word;
                 element.FindPropertyRelative("boneName").stringValue = WeaknessEntries[i].bone;
-                element.FindPropertyRelative("simplifiedWord").stringValue = WeaknessEntries[i].simple;
             }
 
             so.ApplyModifiedPropertiesWithoutUndo();

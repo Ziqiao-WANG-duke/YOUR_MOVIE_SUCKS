@@ -335,7 +335,8 @@ namespace YourMovieSucks.LabB
 
         private void OnGUI()
         {
-            if (!showSummary) return;
+            // 遥测摘要只在编辑器/开发版里显示（正式包不显示）
+            if (!showSummary || !(Application.isEditor || Debug.isDebugBuild)) return;
 
             int runs = _payload.runs.Count;
             if (runs == 0 && _messageTimer <= 0f) return;

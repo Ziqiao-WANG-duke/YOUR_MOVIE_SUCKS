@@ -1,0 +1,84 @@
+{
+    "appVersion": "0.1.0 / Unity 6000.3.8f1",
+    "scene": "PolePosition",
+    "sessionStart": "2026-10-29 18:25:18",
+    "runs": [],
+    "events": [
+        {
+            "t": 0.0,
+            "type": "run_start",
+            "detail": "index=1 variant=viewfinder_on"
+        },
+        {
+            "t": 0.0,
+            "type": "track_forced",
+            "detail": "to=Director"
+        },
+        {
+            "t": 17.31268310546875,
+            "type": "skip_intro",
+            "detail": ""
+        },
+        {
+            "t": 17.31268310546875,
+            "type": "track_forced",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 32.907371520996097,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 33.86441421508789,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 34.2253303527832,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 34.54225540161133,
+            "type": "switch_effective",
+            "detail": "to=Director after=0.32s"
+        },
+        {
+            "t": 35.14223861694336,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 35.9048957824707,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.76s"
+        }
+    ],
+    "switches": [
+        {
+            "t": 32.907371520996097,
+            "from": "Agent",
+            "to": "Director",
+            "effective": false
+        },
+        {
+            "t": 33.86441421508789,
+            "from": "Director",
+            "to": "Agent",
+            "effective": false
+        },
+        {
+            "t": 34.2253303527832,
+            "from": "Agent",
+            "to": "Director",
+            "effective": true
+        },
+        {
+            "t": 35.14223861694336,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        }
+    ]
+}

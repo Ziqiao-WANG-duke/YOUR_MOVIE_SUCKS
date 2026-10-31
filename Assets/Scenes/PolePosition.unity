@@ -20,7 +20,7 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.055, g: 0.05, b: 0.075, a: 1}
+  m_AmbientSkyColor: {r: 0.1, g: 0.085, b: 0.12, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
@@ -146,6 +146,9 @@ GameObject:
   - component: {fileID: 28838346}
   - component: {fileID: 28838347}
   - component: {fileID: 28838348}
+  - component: {fileID: 28838349}
+  - component: {fileID: 28838351}
+  - component: {fileID: 28838350}
   m_Layer: 0
   m_Name: Systems
   m_TagString: Untagged
@@ -195,7 +198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fe662b32b330ab4f8f866f62a99660d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Combat.PlayerHealth
-  maxHp: 100
+  maxCells: 9
 --- !u!114 &28838333
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -359,6 +362,7 @@ MonoBehaviour:
   - {fileID: 841823727}
   - {fileID: 622629181}
   zombiePrefab: {fileID: 7541338662265847762, guid: c0e55708ee2fbd443bc2465e465e1724, type: 3}
+  encounterAsset: {fileID: 11400000, guid: fd5dfaa20b6c7c54c92723b57bfc2a7c, type: 2}
   waveWords:
   - mine
   - my pole
@@ -423,8 +427,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e067b4dbf603dcf409d1daaabe5d868d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Combat.ScreenBlood
+  clawTexture: {fileID: 2800000, guid: 574cb96a93033414aa556087c3af6541, type: 3}
+  splashTextures:
+  - {fileID: 2800000, guid: 1e6266934c8582547be6fd06bf6771dd, type: 3}
+  - {fileID: 2800000, guid: 7dd17bbf35fbb8f4ca8219d26da01906, type: 3}
+  reactToPlayerDamage: 1
+  playerHealth: {fileID: 28838332}
+  clawAlpha: 0.8
+  clawCenter: {x: -0.16027287, y: -0.3089744}
+  clawJitter: {x: 0.1, y: 0.06}
+  clawScreenWidth: 0.62
+  clawRotation: {x: -7, y: 7}
+  clawScaleRange: {x: 0.9, y: 1.05}
+  hitSplashAlpha: 0.6
+  hitSplashMax: 2
+  hitSplashChance: 0.85
+  splashSizeRange: {x: 0.18, y: 0.38}
   splatterAlpha: 0.32
-  fadeDuration: 0.75
+  holdTime: 0.35
+  fadeDuration: 1.1
+  sortingOrder: -10
 --- !u!114 &28838340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -496,8 +518,9 @@ MonoBehaviour:
   rushSpeed: 1.6
   attackRange: 1.7
   attackCountdown: 1.5
-  attackDamage: 35
-  playerMaxHp: 100
+  attackCells: 1
+  forceUniformAttackCells: 0
+  playerMaxCells: 9
   enemiesPerWave: 2
   waveAdvanceDelay: 2
   mainCombatTotalEnemies: 8
@@ -618,8 +641,69 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Combat.DirectorWeaknessView
   typing: {fileID: 28838331}
   trackInput: {fileID: 28838330}
-  closeUp: {fileID: 0}
   weaknessLabelOffsetY: 0.3
+--- !u!114 &28838349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 28838329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b3291786b90ff4a8d08d1e2a0adc3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Demo.PlayerHurtSfx
+  audio: {fileID: 28838346}
+  playerHealth: {fileID: 28838332}
+  hurtGroups:
+  - firstId: pp_hit_agt_02_not_the_face
+    secondId: pp_hit_dir_01_ruining_the_shot
+  - firstId: pp_low_agt_01_little_help
+    secondId: pp_hit_dir_02_bleeding_toward_camera
+  - firstId: pp_low_agt_02_gonna_die
+    secondId: pp_low_dir_01_keep_going
+  skipWhileDialoguePlaying: 1
+  waitForGroupToFinish: 1
+  avoidRepeatGroup: 1
+  hurtSfxIds: []
+  volumeScale: 1
+  pitchJitter: 0.08
+  minIntervalSeconds: 0.06
+  avoidRepeatWindow: 1
+  usePlaceholderWhenNoClips: 1
+  placeholderVolume: 0.8
+  placeholderDuration: 0.3
+  impactLayerVolume: 0.25
+--- !u!114 &28838350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 28838329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4c3002d97500094b95457663519fc13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.UI.HudLayoutPanel
+  applier: {fileID: 28838351}
+  panelWidth: 360
+  stepPixels: 2
+--- !u!114 &28838351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 28838329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be11af67306d0664a84aa836c28a458b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.UI.HudLayoutApplier
+  layout: {fileID: 11400000, guid: e2665446ba9338b4f9a12be80449259b, type: 2}
+  rescanInterval: 0.5
 --- !u!1 &40096531
 GameObject:
   m_ObjectHideFlags: 0
@@ -632,6 +716,7 @@ GameObject:
   - component: {fileID: 40096535}
   - component: {fileID: 40096534}
   - component: {fileID: 40096533}
+  - component: {fileID: 40096536}
   m_Layer: 0
   m_Name: Floor
   m_TagString: Untagged
@@ -649,7 +734,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.1, z: 10}
-  m_LocalScale: {x: 22, y: 0.2, z: 30}
+  m_LocalScale: {x: 30, y: 0.2, z: 30}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 295222113}
@@ -679,7 +764,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: cda0988504440054188abeaedac5b6ef, type: 2}
+  - {fileID: 2100000, guid: 4e463db05b89d384088d2424d7fbfbb1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -732,6 +817,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 40096531}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &40096536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 40096531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8295a1ffc9879641bd4a32bac924540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroMaterialBinding
+  target: {fileID: 40096533}
+  retroVariants:
+  - {fileID: 2100000, guid: 341f38b4a4c8a8c4f8247d9f2121a66d, type: 2}
+  controlSnapping: 1
+  controlSnapGrid: 1
+  controlAffine: 1
+  controlShading: 1
 --- !u!1 &44243342
 GameObject:
   m_ObjectHideFlags: 0
@@ -741,9 +845,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 44243343}
-  - component: {fileID: 44243346}
   - component: {fileID: 44243345}
-  - component: {fileID: 44243344}
   m_Layer: 0
   m_Name: Stage
   m_TagString: Untagged
@@ -761,60 +863,11 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.25, z: 10}
-  m_LocalScale: {x: 9, y: 0.5, z: 4.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 295222113}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &44243344
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 44243342}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 6374fe8dca88f45438db12f3ac8bcb22, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &44243345
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -834,16 +887,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 9, y: 0.5, z: 4.5}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!33 &44243346
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 44243342}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &69479370
 GameObject:
   m_ObjectHideFlags: 0
@@ -856,6 +901,7 @@ GameObject:
   - component: {fileID: 69479374}
   - component: {fileID: 69479373}
   - component: {fileID: 69479372}
+  - component: {fileID: 69479375}
   m_Layer: 0
   m_Name: WallBack
   m_TagString: Untagged
@@ -903,7 +949,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31ebff632842e9f4e88ec160e523e69a, type: 2}
+  - {fileID: 2100000, guid: ebe2a400ca12ecf44b2dc4e98da97113, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -956,6 +1002,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 69479370}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &69479375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69479370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8295a1ffc9879641bd4a32bac924540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroMaterialBinding
+  target: {fileID: 69479372}
+  retroVariants:
+  - {fileID: 2100000, guid: b7a19961dc5e18e4fb3a16ef3cffd273, type: 2}
+  controlSnapping: 1
+  controlSnapGrid: 1
+  controlAffine: 1
+  controlShading: 1
 --- !u!1 &153940966
 GameObject:
   m_ObjectHideFlags: 0
@@ -1030,6 +1095,7 @@ GameObject:
   - component: {fileID: 240137035}
   - component: {fileID: 240137034}
   - component: {fileID: 240137033}
+  - component: {fileID: 240137036}
   m_Layer: 0
   m_Name: BoothLeft
   m_TagString: Untagged
@@ -1130,6 +1196,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 240137031}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &240137036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 240137031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8295a1ffc9879641bd4a32bac924540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroMaterialBinding
+  target: {fileID: 240137033}
+  retroVariants:
+  - {fileID: 2100000, guid: 2c55fbc7b37bb9243a5a533fd575f272, type: 2}
+  controlSnapping: 1
+  controlSnapGrid: 1
+  controlAffine: 1
+  controlShading: 1
 --- !u!1 &260420447
 GameObject:
   m_ObjectHideFlags: 0
@@ -1142,6 +1227,7 @@ GameObject:
   - component: {fileID: 260420451}
   - component: {fileID: 260420450}
   - component: {fileID: 260420449}
+  - component: {fileID: 260420452}
   m_Layer: 0
   m_Name: NeonTubeLeft
   m_TagString: Untagged
@@ -1242,6 +1328,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 260420447}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &260420452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 260420447}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8295a1ffc9879641bd4a32bac924540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroMaterialBinding
+  target: {fileID: 260420449}
+  retroVariants:
+  - {fileID: 2100000, guid: f23dee0360d4e854391ad0ebd022074f, type: 2}
+  controlSnapping: 1
+  controlSnapGrid: 1
+  controlAffine: 1
+  controlShading: 1
 --- !u!1 &286881844
 GameObject:
   m_ObjectHideFlags: 0
@@ -1308,7 +1413,6 @@ Transform:
   - {fileID: 1506788074}
   - {fileID: 1443502437}
   - {fileID: 44243343}
-  - {fileID: 753759898}
   - {fileID: 240137032}
   - {fileID: 1868002644}
   - {fileID: 716212737}
@@ -1432,6 +1536,7 @@ GameObject:
   - component: {fileID: 517029627}
   - component: {fileID: 517029626}
   - component: {fileID: 517029625}
+  - component: {fileID: 517029628}
   m_Layer: 0
   m_Name: WallLeft
   m_TagString: Untagged
@@ -1479,7 +1584,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31ebff632842e9f4e88ec160e523e69a, type: 2}
+  - {fileID: 2100000, guid: ebe2a400ca12ecf44b2dc4e98da97113, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1532,6 +1637,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 517029623}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &517029628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517029623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8295a1ffc9879641bd4a32bac924540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroMaterialBinding
+  target: {fileID: 517029625}
+  retroVariants:
+  - {fileID: 2100000, guid: b7a19961dc5e18e4fb3a16ef3cffd273, type: 2}
+  controlSnapping: 1
+  controlSnapGrid: 1
+  controlAffine: 1
+  controlShading: 1
 --- !u!1 &541599171
 GameObject:
   m_ObjectHideFlags: 0
@@ -1544,6 +1668,7 @@ GameObject:
   - component: {fileID: 541599175}
   - component: {fileID: 541599174}
   - component: {fileID: 541599173}
+  - component: {fileID: 541599176}
   m_Layer: 0
   m_Name: NeonTubeRight
   m_TagString: Untagged
@@ -1644,6 +1769,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 541599171}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &541599176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 541599171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8295a1ffc9879641bd4a32bac924540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroMaterialBinding
+  target: {fileID: 541599173}
+  retroVariants:
+  - {fileID: 2100000, guid: c518cfd8cce3aa44cb9ac94c27024828, type: 2}
+  controlSnapping: 1
+  controlSnapGrid: 1
+  controlAffine: 1
+  controlShading: 1
 --- !u!1 &622629180
 GameObject:
   m_ObjectHideFlags: 0
@@ -1687,6 +1831,7 @@ GameObject:
   - component: {fileID: 630194203}
   - component: {fileID: 630194202}
   - component: {fileID: 630194201}
+  - component: {fileID: 630194204}
   m_Layer: 0
   m_Name: NeonTubeBackB
   m_TagString: Untagged
@@ -1787,6 +1932,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 630194199}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &630194204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 630194199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8295a1ffc9879641bd4a32bac924540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroMaterialBinding
+  target: {fileID: 630194201}
+  retroVariants:
+  - {fileID: 2100000, guid: c518cfd8cce3aa44cb9ac94c27024828, type: 2}
+  controlSnapping: 1
+  controlSnapGrid: 1
+  controlAffine: 1
+  controlShading: 1
 --- !u!1 &636496664
 GameObject:
   m_ObjectHideFlags: 0
@@ -1831,7 +1995,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 1, g: 0.3, b: 0.55, a: 1}
-  m_Intensity: 5
+  m_Intensity: 8
   m_Range: 11
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1926,6 +2090,7 @@ GameObject:
   - component: {fileID: 716212740}
   - component: {fileID: 716212739}
   - component: {fileID: 716212738}
+  - component: {fileID: 716212741}
   m_Layer: 0
   m_Name: BarCounter
   m_TagString: Untagged
@@ -2026,96 +2191,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 716212736}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &753759897
-GameObject:
+--- !u!114 &716212741
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 753759898}
-  - component: {fileID: 753759900}
-  - component: {fileID: 753759899}
-  m_Layer: 0
-  m_Name: BrassPole
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &753759898
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 753759897}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.7, z: 10}
-  m_LocalScale: {x: 0.28, y: 2.2, z: 0.28}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 295222113}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &753759899
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 753759897}
+  m_GameObject: {fileID: 716212736}
   m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 5d704c0e36ae52346972d4a0e6221d1f, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &753759900
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 753759897}
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8295a1ffc9879641bd4a32bac924540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroMaterialBinding
+  target: {fileID: 716212738}
+  retroVariants:
+  - {fileID: 2100000, guid: 2b66762f30e91db49b8cd963f722fa41, type: 2}
+  controlSnapping: 1
+  controlSnapGrid: 1
+  controlAffine: 1
+  controlShading: 1
 --- !u!1 &818633496
 GameObject:
   m_ObjectHideFlags: 0
@@ -2371,7 +2465,7 @@ Light:
   m_Type: 2
   m_Color: {r: 1, g: 0.25, b: 0.75, a: 1}
   m_Intensity: 9
-  m_Range: 12
+  m_Range: 4
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
@@ -2453,6 +2547,204 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &1072660094
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1072660097}
+  - component: {fileID: 1072660096}
+  - component: {fileID: 1072660095}
+  - component: {fileID: 1072660098}
+  m_Layer: 0
+  m_Name: Retro Rendering
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1072660095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072660094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbb8717e87a7be14fba04d434e3202e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroCharacterAutoBinding
+  controller: {fileID: 1072660096}
+  retroCharacterShader: {fileID: 4800000, guid: 0c2f9066b70ed8740afd914795b57054, type: 3}
+  targetComponentName: TypingTarget
+  rescanInterval: 0.5
+  smoothness: 0.15
+--- !u!114 &1072660096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072660094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2b002796b6b2a143944fbfea9f38463, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroRenderingController
+  sceneCamera: {fileID: 890624404}
+  compositeShader: {fileID: 4800000, guid: b5d289551f353bb498ebc7b9bb1a96aa, type: 3}
+  pipelineOverride: {fileID: 11400000, guid: edb843fa57b2dbe4591e980f55af3e59, type: 2}
+  expectedPipeline: {fileID: 11400000, guid: 4b83569d67af61e458304325a23e5dfd, type: 2}
+  presentationRendererIndex: 1
+  retroEnabled: 1
+  preset: {fileID: 11400000, guid: da12542b798d5954eb9eb3fdcee5127b, type: 2}
+  resolution: 1
+  filtering: 0
+  quantization: 1
+  colorLevels: 32
+  dithering: 0
+  vertexSnapping: 0.15
+  affineMapping: 0.15
+  shading: 1
+  materialBindings:
+  - {fileID: 40096536}
+  - {fileID: 69479375}
+  - {fileID: 517029628}
+  - {fileID: 1506788078}
+  - {fileID: 1443502441}
+  - {fileID: 240137036}
+  - {fileID: 1868002648}
+  - {fileID: 716212741}
+  - {fileID: 260420452}
+  - {fileID: 541599176}
+  - {fileID: 1688482018}
+  - {fileID: 630194204}
+  showRuntimeControls: 0
+  weakPointLayer: 6
+  uiLayer: 5
+--- !u!4 &1072660097
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072660094}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1072660098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1072660094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d41eb0fba28673b49bf7df92ce6fda9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.UI.DirectorFilmFilter
+  trackInput: {fileID: 28838330}
+  retro: {fileID: 1072660096}
+  encounter: {fileID: 28838336}
+  enabled_: 1
+  onlyDuringCombat: 1
+  fadeSpeed: 14
+  contrast: 1.7
+  lift: 0.03
+  brightness: 1.8
+  threshold: 0.06
+  grain: 0.42
+  grainScale: 1.4
+  flicker: 0.3
+  flickerSpeed: 16
+  vignette: 0.6
+  verticalStripes: 0.5
+  scratches: 0.6
+  scratchSpeed: 2.6
+  weakPointScale: 1.5
+--- !u!1001 &1142717369
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.33
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 9.99
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
+      propertyPath: m_Name
+      value: SM_Stage
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6c6104d6e4a323741b52a9f0489910c0, type: 3}
 --- !u!1 &1245803907
 GameObject:
   m_ObjectHideFlags: 0
@@ -2496,6 +2788,7 @@ GameObject:
   - component: {fileID: 1443502440}
   - component: {fileID: 1443502439}
   - component: {fileID: 1443502438}
+  - component: {fileID: 1443502441}
   m_Layer: 0
   m_Name: Ceiling
   m_TagString: Untagged
@@ -2543,7 +2836,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31ebff632842e9f4e88ec160e523e69a, type: 2}
+  - {fileID: 2100000, guid: 4e463db05b89d384088d2424d7fbfbb1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2596,6 +2889,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1443502436}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1443502441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1443502436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8295a1ffc9879641bd4a32bac924540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroMaterialBinding
+  target: {fileID: 1443502438}
+  retroVariants:
+  - {fileID: 2100000, guid: b7a19961dc5e18e4fb3a16ef3cffd273, type: 2}
+  controlSnapping: 1
+  controlSnapGrid: 1
+  controlAffine: 1
+  controlShading: 1
 --- !u!1 &1471414252
 GameObject:
   m_ObjectHideFlags: 0
@@ -2640,7 +2952,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.25, g: 0.9, b: 1, a: 1}
-  m_Intensity: 5
+  m_Intensity: 8
   m_Range: 11
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -2766,6 +3078,7 @@ GameObject:
   - component: {fileID: 1506788077}
   - component: {fileID: 1506788076}
   - component: {fileID: 1506788075}
+  - component: {fileID: 1506788078}
   m_Layer: 0
   m_Name: WallRight
   m_TagString: Untagged
@@ -2813,7 +3126,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31ebff632842e9f4e88ec160e523e69a, type: 2}
+  - {fileID: 2100000, guid: ebe2a400ca12ecf44b2dc4e98da97113, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2866,6 +3179,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1506788073}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1506788078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1506788073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8295a1ffc9879641bd4a32bac924540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroMaterialBinding
+  target: {fileID: 1506788075}
+  retroVariants:
+  - {fileID: 2100000, guid: b7a19961dc5e18e4fb3a16ef3cffd273, type: 2}
+  controlSnapping: 1
+  controlSnapGrid: 1
+  controlAffine: 1
+  controlShading: 1
 --- !u!1 &1622966591
 GameObject:
   m_ObjectHideFlags: 0
@@ -2949,10 +3281,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1644965646}
   - component: {fileID: 1644965645}
-  - component: {fileID: 1644965644}
   - component: {fileID: 1644965643}
   - component: {fileID: 1644965642}
   - component: {fileID: 1644965641}
+  - component: {fileID: 1644965647}
+  - component: {fileID: 1644965649}
+  - component: {fileID: 1644965648}
   m_Layer: 0
   m_Name: Hud
   m_TagString: Untagged
@@ -3005,19 +3339,6 @@ MonoBehaviour:
   typing: {fileID: 28838331}
   playerHealth: {fileID: 28838332}
   cameraShake: {fileID: 890624403}
---- !u!114 &1644965644
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1644965640}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8803b93ba384e3d4c9883a80915fad6e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.UI.HPUI
-  playerHealth: {fileID: 28838332}
 --- !u!114 &1644965645
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3051,6 +3372,64 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1644965647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1644965640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aa957179c6bd2442a248db998d8f8e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.UI.HealthUI
+  playerHealth: {fileID: 28838332}
+  full: {fileID: 2800000, guid: 810a8edc5f75f0443ace4313a0904bfb, type: 3}
+  empty: {fileID: 2800000, guid: f1eef228f1899c842b1dc749eb18e38d, type: 3}
+  anchor: {x: 0, y: 1}
+  offset: {x: 24, y: -58}
+  width: 620
+  contentUv:
+    serializedVersion: 2
+    x: 0.0439
+    y: 0.415
+    width: 0.9121
+    height: 0.167
+  cells: 9
+  cellsStartU: 0.0794
+  cellsEndU: 0.9187
+  sortingOrder: 40
+--- !u!114 &1644965648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1644965640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de609b95310b4a946a7a5e08ce004f2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.UI.VfxSwitch
+--- !u!114 &1644965649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1644965640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2c463c2fa468c44682c70f4fa9ac60d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.UI.TitleScreen
+  title: YOUR MOVIE SUCKS!
+  subtitle: "THE NEON BUTCHERY  \xB7  A GRINDHOUSE TYPE-OFF"
+  hints: '[ENTER]  START      [M]  MUTE: {0}      [V]  VFX: {1}      [ESC]  QUIT'
+  footer: "TYPE THE WORDS \xB7 CAPS LOCK SWITCHES TRACK \xB7 AGENT = lowercase /
+    DIRECTOR = UPPERCASE"
+  sortingOrder: 5000
 --- !u!1 &1688482013
 GameObject:
   m_ObjectHideFlags: 0
@@ -3063,6 +3442,7 @@ GameObject:
   - component: {fileID: 1688482017}
   - component: {fileID: 1688482016}
   - component: {fileID: 1688482015}
+  - component: {fileID: 1688482018}
   m_Layer: 0
   m_Name: NeonTubeBackA
   m_TagString: Untagged
@@ -3163,6 +3543,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1688482013}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1688482018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1688482013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8295a1ffc9879641bd4a32bac924540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroMaterialBinding
+  target: {fileID: 1688482015}
+  retroVariants:
+  - {fileID: 2100000, guid: f23dee0360d4e854391ad0ebd022074f, type: 2}
+  controlSnapping: 1
+  controlSnapGrid: 1
+  controlAffine: 1
+  controlShading: 1
 --- !u!1 &1868002643
 GameObject:
   m_ObjectHideFlags: 0
@@ -3175,6 +3574,7 @@ GameObject:
   - component: {fileID: 1868002647}
   - component: {fileID: 1868002646}
   - component: {fileID: 1868002645}
+  - component: {fileID: 1868002648}
   m_Layer: 0
   m_Name: BoothRight
   m_TagString: Untagged
@@ -3275,6 +3675,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1868002643}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1868002648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868002643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8295a1ffc9879641bd4a32bac924540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Retro.RetroMaterialBinding
+  target: {fileID: 1868002645}
+  retroVariants:
+  - {fileID: 2100000, guid: 2c55fbc7b37bb9243a5a533fd575f272, type: 2}
+  controlSnapping: 1
+  controlSnapGrid: 1
+  controlAffine: 1
+  controlShading: 1
 --- !u!1 &1877309867
 GameObject:
   m_ObjectHideFlags: 0
@@ -3461,8 +3880,8 @@ Light:
   serializedVersion: 12
   m_Type: 0
   m_Color: {r: 1, g: 0.82, b: 0.86, a: 1}
-  m_Intensity: 8
-  m_Range: 16
+  m_Intensity: 22
+  m_Range: 32
   m_SpotAngle: 55
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
@@ -3588,7 +4007,7 @@ Light:
   serializedVersion: 12
   m_Type: 1
   m_Color: {r: 0.6, g: 0.62, b: 0.85, a: 1}
-  m_Intensity: 0.12
+  m_Intensity: 0.5
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -3680,3 +4099,5 @@ SceneRoots:
   - {fileID: 295222113}
   - {fileID: 28838345}
   - {fileID: 1644965646}
+  - {fileID: 1072660097}
+  - {fileID: 1142717369}

@@ -55,8 +55,8 @@ namespace YourMovieSucks.UI
 
         private void OnGUI()
         {
-            // 受击红闪
-            if (_damageFlashTimer > 0f)
+            // 受击红闪（VFX 关闭时不画，避免“关了还有效果”）
+            if (_damageFlashTimer > 0f && GameOptions.VfxEnabled)
             {
                 float alpha = Mathf.Clamp01(_damageFlashTimer / 0.35f) * 0.5f;
                 var prev = GUI.color;

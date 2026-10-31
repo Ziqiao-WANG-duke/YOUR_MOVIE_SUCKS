@@ -22,10 +22,13 @@ namespace YourMovieSucks.LabB
         [Tooltip("怪物开始攻击玩家的距离（米，相对相机）。越小越有压迫感：1.7 ≈ 怪走到脸上、只看得见上半身")]
         public float attackRange = 1.7f;
         public float attackCountdown = 1.5f;
-        public float attackDamage = 35f;
+        public float attackCells = 1f;
+        [Tooltip("勾上则所有怪物统一用上面的扣格数（默认关：每个预制件自己说了算，特殊怪可设 2）")]
+        public bool forceUniformAttackCells;
 
         [Header("玩家")]
-        public float playerMaxHp = 100f;
+        [Tooltip("玩家血格数：与血条贴图的格子数一致（当前胶片素材 9 格）")]
+        public float playerMaxCells = 9f;
 
         [Header("刷怪")]
         public int enemiesPerWave = 2;
@@ -127,11 +130,11 @@ namespace YourMovieSucks.LabB
             Slider("rushSpeed", ref rushSpeed, 0.05f, 8f);
             Slider("attackRange", ref attackRange, 1f, 12f);
             Slider("attackCountdown", ref attackCountdown, 0.2f, 8f);
-            Slider("attackDamage", ref attackDamage, 1f, 100f);
+            Slider("attackCells", ref attackCells, 1f, 3f);
 
             GUILayout.Space(4f);
             GUILayout.Label("-- 玩家 --");
-            Slider("playerMaxHp", ref playerMaxHp, 10f, 300f);
+            Slider("playerMaxCells", ref playerMaxCells, 1f, 12f);
 
             GUILayout.Space(4f);
             GUILayout.Label("-- 刷怪 --");

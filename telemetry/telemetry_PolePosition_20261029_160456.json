@@ -1,0 +1,29 @@
+{
+    "appVersion": "0.1.0 / Unity 6000.3.8f1",
+    "scene": "PolePosition",
+    "sessionStart": "2026-10-29 16:04:44",
+    "runs": [],
+    "events": [
+        {
+            "t": 25.33719825744629,
+            "type": "run_start",
+            "detail": "index=1 variant=viewfinder_on"
+        },
+        {
+            "t": 25.33719825744629,
+            "type": "track_forced",
+            "detail": "to=Director"
+        },
+        {
+            "t": 28.003456115722658,
+            "type": "skip_intro",
+            "detail": ""
+        },
+        {
+            "t": 28.003456115722658,
+            "type": "track_forced",
+            "detail": "to=Agent"
+        }
+    ],
+    "switches": []
+}

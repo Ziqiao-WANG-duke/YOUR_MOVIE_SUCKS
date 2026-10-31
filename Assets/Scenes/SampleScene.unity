@@ -653,7 +653,6 @@ GameObject:
   - component: {fileID: 1711144358}
   - component: {fileID: 1711144359}
   - component: {fileID: 1711144360}
-  - component: {fileID: 1711144361}
   - component: {fileID: 1711144364}
   - component: {fileID: 1711144363}
   - component: {fileID: 1711144362}
@@ -677,6 +676,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Input.TrackInput
   toggleMode: 1
+  extendedSwitchKeys: 0
+  showDebugOverlay: 1
 --- !u!4 &1711144349
 Transform:
   m_ObjectHideFlags: 0
@@ -706,6 +707,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Typing.TypingController
   trackInput: {fileID: 0}
   spawnTestWordsOnStart: 0
+  showDebugOverlay: 1
 --- !u!114 &1711144352
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -741,6 +743,7 @@ MonoBehaviour:
   zoomDuration: 2.5
   slowFactor: 0.3
   flashDuration: 0.15
+  tricksEnabled: 1
 --- !u!114 &1711144354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -753,8 +756,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e067b4dbf603dcf409d1daaabe5d868d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Combat.ScreenBlood
+  clawTexture: {fileID: 0}
+  splashTextures: []
+  reactToPlayerDamage: 1
+  playerHealth: {fileID: 0}
+  clawAlpha: 0.85
+  clawCenter: {x: 0, y: 0.1}
+  clawJitter: {x: 0.1, y: 0.06}
+  clawScreenWidth: 0.72
+  clawRotation: {x: -7, y: 7}
+  clawScaleRange: {x: 0.92, y: 1.12}
+  hitSplashAlpha: 0.6
+  hitSplashMax: 2
+  hitSplashChance: 0.8
+  splashSizeRange: {x: 0.22, y: 0.45}
   splatterAlpha: 0.5
+  holdTime: 0.35
   fadeDuration: 1.2
+  sortingOrder: -10
 --- !u!114 &1711144355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -785,7 +804,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fe662b32b330ab4f8f866f62a99660d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Combat.PlayerHealth
-  maxHp: 100
+  maxCells: 9
 --- !u!114 &1711144357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -811,6 +830,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.UI.WordLabelManager
   typing: {fileID: 0}
+  trackInput: {fileID: 0}
+  alwaysOnTopMaterial: {fileID: 0}
 --- !u!114 &1711144359
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -839,19 +860,6 @@ MonoBehaviour:
   typing: {fileID: 0}
   playerHealth: {fileID: 0}
   cameraShake: {fileID: 0}
---- !u!114 &1711144361
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1711144347}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8803b93ba384e3d4c9883a80915fad6e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.UI.HPUI
-  playerHealth: {fileID: 0}
 --- !u!114 &1711144362
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -888,8 +896,9 @@ MonoBehaviour:
   rushSpeed: 1.6
   attackRange: 4
   attackCountdown: 1.5
-  attackDamage: 35
-  playerMaxHp: 100
+  attackCells: 1
+  forceUniformAttackCells: 0
+  playerMaxCells: 9
   enemiesPerWave: 2
   waveAdvanceDelay: 2
   mainCombatTotalEnemies: 12
@@ -898,10 +907,22 @@ MonoBehaviour:
   zoomFov: 38
   zoomDuration: 2.5
   slowFactor: 0.3
-  hitStopOn: 1
-  hitStopSeconds: 0.05
   screenShakeOn: 1
   shakeStrength: 1
+  screenBloodOn: 1
+  splatterAlpha: 0.32
+  enemyDeathHold: 1.2
+  rushScaleMultiplier: 1
+  attackLungeScaleMultiplier: 1
+  laneConvergeStart: 6
+  closeLaneOffset: 0.85
+  labelCloseReferenceDistance: 2
+  labelCloseScaleFactor: 0.5
+  labelSafeTop: 0.82
+  voVolume: 1
+  bgmVolume: 0.22
+  sfxVolume: 0.8
+  gunshotVolume: 1
   variantMode: 0
   variantNames:
   - viewfinder_on

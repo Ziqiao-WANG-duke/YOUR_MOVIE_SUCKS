@@ -1,0 +1,116 @@
+{
+    "appVersion": "0.1.0 / Unity 6000.3.8f1",
+    "scene": "PolePosition",
+    "sessionStart": "2026-10-25 18:04:50",
+    "runs": [],
+    "events": [
+        {
+            "t": 0.0,
+            "type": "run_start",
+            "detail": "index=1 variant=viewfinder_on"
+        },
+        {
+            "t": 0.0,
+            "type": "track_forced",
+            "detail": "to=Director"
+        },
+        {
+            "t": 6.727895736694336,
+            "type": "skip_intro",
+            "detail": ""
+        },
+        {
+            "t": 6.727895736694336,
+            "type": "track_forced",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 12.412172317504883,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 12.723562240600586,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 13.20221996307373,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 13.904670715332032,
+            "type": "switch_effective",
+            "detail": "to=Director after=0.70s"
+        },
+        {
+            "t": 14.628875732421875,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 15.483248710632325,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.85s"
+        },
+        {
+            "t": 37.76164627075195,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 38.55418395996094,
+            "type": "switch_effective",
+            "detail": "to=Director after=0.79s"
+        },
+        {
+            "t": 39.04533386230469,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 39.716163635253909,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.67s"
+        }
+    ],
+    "switches": [
+        {
+            "t": 12.412172317504883,
+            "from": "Agent",
+            "to": "Director",
+            "effective": false
+        },
+        {
+            "t": 12.723562240600586,
+            "from": "Director",
+            "to": "Agent",
+            "effective": false
+        },
+        {
+            "t": 13.20221996307373,
+            "from": "Agent",
+            "to": "Director",
+            "effective": true
+        },
+        {
+            "t": 14.628875732421875,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        },
+        {
+            "t": 37.76164627075195,
+            "from": "Agent",
+            "to": "Director",
+            "effective": true
+        },
+        {
+            "t": 39.04533386230469,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        }
+    ]
+}

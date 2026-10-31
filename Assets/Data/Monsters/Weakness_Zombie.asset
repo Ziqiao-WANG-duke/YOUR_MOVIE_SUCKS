@@ -16,20 +16,15 @@ MonoBehaviour:
   - partLabel: HEAD
     weakWord: HEAD
     boneName: mixamorig:Head
-    simplifiedWord: HIT
   - partLabel: LEG
     weakWord: LEG
     boneName: mixamorig:LeftLeg
-    simplifiedWord: LIE
   - partLabel: NECK
     weakWord: NECK
     boneName: mixamorig:Neck
-    simplifiedWord: CUT
   - partLabel: SHOULDER
     weakWord: SHOULDER
     boneName: mixamorig:LeftShoulder
-    simplifiedWord: SHUT
   - partLabel: MOUTH
     weakWord: MOUTH
     boneName: mixamorig:Head
-    simplifiedWord: EAT

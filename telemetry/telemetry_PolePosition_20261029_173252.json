@@ -1,0 +1,190 @@
+{
+    "appVersion": "0.1.0 / Unity 6000.3.8f1",
+    "scene": "PolePosition",
+    "sessionStart": "2026-10-29 17:32:20",
+    "runs": [],
+    "events": [
+        {
+            "t": 0.0,
+            "type": "run_start",
+            "detail": "index=1 variant=viewfinder_on"
+        },
+        {
+            "t": 0.0,
+            "type": "track_forced",
+            "detail": "to=Director"
+        },
+        {
+            "t": 6.796299934387207,
+            "type": "skip_intro",
+            "detail": ""
+        },
+        {
+            "t": 6.796299934387207,
+            "type": "track_forced",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 10.479767799377442,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 11.25698184967041,
+            "type": "switch_effective",
+            "detail": "to=Director after=0.78s"
+        },
+        {
+            "t": 11.873785972595215,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 12.578500747680664,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.70s"
+        },
+        {
+            "t": 17.051265716552736,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 17.7178955078125,
+            "type": "switch_effective",
+            "detail": "to=Director after=0.67s"
+        },
+        {
+            "t": 18.247228622436525,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 18.934900283813478,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.69s"
+        },
+        {
+            "t": 21.37906837463379,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 21.994176864624025,
+            "type": "switch_effective",
+            "detail": "to=Director after=0.62s"
+        },
+        {
+            "t": 22.489255905151368,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 23.177427291870118,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.69s"
+        },
+        {
+            "t": 26.731184005737306,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 27.472047805786134,
+            "type": "switch_effective",
+            "detail": "to=Director after=0.74s"
+        },
+        {
+            "t": 27.85504722595215,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 28.633861541748048,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.78s"
+        },
+        {
+            "t": 31.791156768798829,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 32.54787826538086,
+            "type": "switch_effective",
+            "detail": "to=Director after=0.76s"
+        },
+        {
+            "t": 33.52520751953125,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 34.16884994506836,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.64s"
+        }
+    ],
+    "switches": [
+        {
+            "t": 10.479767799377442,
+            "from": "Agent",
+            "to": "Director",
+            "effective": true
+        },
+        {
+            "t": 11.873785972595215,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        },
+        {
+            "t": 17.051265716552736,
+            "from": "Agent",
+            "to": "Director",
+            "effective": true
+        },
+        {
+            "t": 18.247228622436525,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        },
+        {
+            "t": 21.37906837463379,
+            "from": "Agent",
+            "to": "Director",
+            "effective": true
+        },
+        {
+            "t": 22.489255905151368,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        },
+        {
+            "t": 26.731184005737306,
+            "from": "Agent",
+            "to": "Director",
+            "effective": true
+        },
+        {
+            "t": 27.85504722595215,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        },
+        {
+            "t": 31.791156768798829,
+            "from": "Agent",
+            "to": "Director",
+            "effective": true
+        },
+        {
+            "t": 33.52520751953125,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        }
+    ]
+}

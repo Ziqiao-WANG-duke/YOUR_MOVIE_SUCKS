@@ -7,6 +7,7 @@ using YourMovieSucks.Input;
 using YourMovieSucks.LabB;
 using YourMovieSucks.Level;
 using YourMovieSucks.Typing;
+using YourMovieSucks.UI;
 
 namespace YourMovieSucks.Demo
 {
@@ -124,6 +125,9 @@ namespace YourMovieSucks.Demo
 
         private IEnumerator Start()
         {
+            // 标题画面：玩家按 ENTER 后才开始（场景里没挂 TitleScreen 时门直接打开）
+            while (!TitleScreen.GateOpen) yield return null;
+
             BeginRun();
 
             yield return BlackoutFadeIn();

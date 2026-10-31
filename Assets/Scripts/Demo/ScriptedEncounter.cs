@@ -29,6 +29,17 @@ namespace YourMovieSucks.Demo
         [Tooltip("丧尸预制件（Assets/Prefabs/StripperZombie.prefab）。留空则退回灰盒方块占位体")]
         [SerializeField] private GameObject zombiePrefab;
 
+        [Header("战斗编排（留空 = 用下面的硬编码波次）")]
+        [Tooltip("由 Combat Editor 生成的战斗数据：怪物种类 / 每波长短词数量 / 波次数 / 长词与短词怪速度")]
+        [SerializeField] private CombatEncounterAsset encounterAsset;
+
+        /// <summary>战斗编排资产；为空时走硬编码波次（脚本波 4 + 主战斗）。</summary>
+        public CombatEncounterAsset EncounterAsset
+        {
+            get => encounterAsset;
+            set => encounterAsset = value;
+        }
+
         [Header("脚本波次（固定词序，每波 1 只）")]
         [SerializeField] private string[] waveWords = { "mine", "my pole", "get off", "wait your turn" };
 
@@ -53,6 +64,7 @@ namespace YourMovieSucks.Demo
 
         [Header("入场演出")]
         [SerializeField] private float entranceDashDuration = 0.45f;
+        [Tooltip("入场僵尸站定咆哮的定格时长（Scream 动画），结束后恢复常规接近/攻击")]
         [SerializeField] private float entranceHugHold = 2.5f;
 
         [Tooltip("刷怪点对应的横向车道（与 spawnPoints 同序，沿相机右方向的世界单位）。\n" +
@@ -73,15 +85,19 @@ namespace YourMovieSucks.Demo
         private bool _running;
         private bool _cleared;
         private string _lastMainWord = string.Empty;
+        private bool _shuffleWords;
 
         public bool IsCleared => _cleared;
+
+        /// <summary>战斗已经开始（BeginCombat 之后、清场之前）。导演模式滤镜用它做门控。</summary>
+        public bool IsRunning => _running && !_cleared;
         public int AliveCount => CountAlive();
 
         public event System.Action OnCleared;
 
         // ---------------------------------------------------------------- 演出层入口
 
-        /// <summary>脚本第 5 段：刷出第一只并让它冲入舞台抱住钢管（此时还没有词条）。</summary>
+        /// <summary>脚本第 5 段：刷出第一只并让它冲入舞台站定咆哮（此时还没有词条）。</summary>
         public IEnumerator PlayEntrance()
         {
             Vector3 pos = entranceSpawn != null
@@ -110,6 +126,12 @@ namespace YourMovieSucks.Demo
 
         private IEnumerator CombatRoutine()
         {
+            if (encounterAsset != null && encounterAsset.WaveCount > 0)
+            {
+                yield return RunAssetWaves(encounterAsset);
+                yield break;
+            }
+
             // 波次 1：入场僵尸（已在 PlayEntrance 刷出，抱着钢管）
             yield return RunSingleWave(_entranceZombie, WaveWord(0));
 
@@ -164,12 +186,19 @@ namespace YourMovieSucks.Demo
         /// 把本局的原始战斗词记到弱点组件上（导演轨弱点识别后要用它算“更简单的战斗词”，
         /// 以及换词时的同首字母兑底）。没有弱点组件的怪物（灰盒方块）自动忽略。
         /// </summary>
-        private static void BindWeakness(TypingTarget zombie, string word)
+        /// <summary>
+        /// 把本局的原始战斗词 + 弱点破坏后的新词库记到弱点组件上
+        /// （导演轨弱点识别后要用它们算换上的新词）。没有弱点组件的怪物（灰盒方块）自动忽略。
+        /// </summary>
+        private static void BindWeakness(TypingTarget zombie, string word, string[] postWeakWords = null)
         {
             if (zombie == null) return;
 
             var weakness = zombie.GetComponent<MonsterWeakness>();
-            if (weakness != null) weakness.OriginalWord = word;
+            if (weakness == null) return;
+
+            weakness.OriginalWord = word;
+            weakness.PostWeakWords = postWeakWords ?? System.Array.Empty<string>();
         }
 
         // ---------------------------------------------------------------- 刷怪
@@ -223,7 +252,12 @@ namespace YourMovieSucks.Demo
 
         private TypingTarget CreateEnemy(Vector3 position, bool entrance, float laneOffset, int spawnIndex = -1)
         {
-            var go = CreateEnemyBody(position, entrance);
+            return CreateEnemy(position, entrance, laneOffset, spawnIndex, zombiePrefab);
+        }
+
+        private TypingTarget CreateEnemy(Vector3 position, bool entrance, float laneOffset, int spawnIndex, GameObject prefab)
+        {
+            var go = CreateEnemyBody(position, entrance, prefab);
 
             var target = go.GetComponent<TypingTarget>();
             if (target == null) target = go.AddComponent<TypingTarget>();
@@ -248,12 +282,12 @@ namespace YourMovieSucks.Demo
         /// 出生即朝向玩家（模型正面 = +Z）：怪物是从舞台深处朝相机过来的，否则丧尸会倒着走。
         /// 车道与速度仍由 TypingTarget 控制，这里只管朝向。
         /// </summary>
-        private GameObject CreateEnemyBody(Vector3 position, bool entrance)
+        private GameObject CreateEnemyBody(Vector3 position, bool entrance, GameObject prefab)
         {
-            if (zombiePrefab != null)
+            if (prefab != null)
             {
-                var body = Instantiate(zombiePrefab, position, FacePlayer(position));
-                body.name = entrance ? "StripperZombie_Entrance" : "StripperZombie";
+                var body = Instantiate(prefab, position, FacePlayer(position));
+                body.name = entrance ? prefab.name + "_Entrance" : prefab.name;
                 return body;
             }
 
@@ -359,6 +393,164 @@ namespace YourMovieSucks.Demo
         {
             // 数量逐渐递减：最后 3 只开始只允许 1 只同屏
             return _remainingPool > 3 ? Mathf.Max(1, mainMaxConcurrent) : Mathf.Max(1, mainEndConcurrent);
+        }
+
+        // ---------------------------------------------------------------- 资产驱动波次
+
+        /// <summary>本波要刷的一只怪：哪一种怪物 + 哪个词长变体。</summary>
+        private struct AssetSpawn
+        {
+            public int type;
+            public MonsterWordTier tier;
+        }
+
+        private static int SpawnKey(int type, MonsterWordTier tier) => type * 2 + (int)tier;
+
+        /// <summary>
+        /// 按战斗编排资产推进：每波按「每种怪的长/短词数量」刷怪，
+        /// 速度与伤害取该怪物该变体的配置；单词不与其他活动词条首字母冲突。
+        /// </summary>
+        private IEnumerator RunAssetWaves(CombatEncounterAsset asset)
+        {
+            _shuffleWords = asset.shuffleWords;
+            var queues = new Dictionary<int, Queue<string>>();
+            var pools = new Dictionary<int, string[]>();
+
+            foreach (var (index, type) in asset.EnabledTypes())
+            {
+                for (int t = 0; t < 2; t++)
+                {
+                    var tier = (MonsterWordTier)t;
+                    var words = new List<string>();
+                    var source = type.WordsFor(tier);
+                    if (source != null)
+                        foreach (var word in source)
+                            if (!string.IsNullOrWhiteSpace(word)) words.Add(word.Trim());
+                    int key = SpawnKey(index, tier);
+                    pools[key] = words.ToArray();
+                    queues[key] = new Queue<string>();
+                }
+            }
+
+            bool entranceUsed = false;
+            for (int w = 0; w < asset.WaveCount; w++)
+            {
+                var wave = asset.waves[w];
+                if (wave == null) continue;
+
+                var plan = BuildWavePlan(asset, w);
+                int next = 0;
+                int limit = Mathf.Max(1, wave.maxConcurrent);
+
+                // 入场僵尸已经在场上（由 PlayEntrance 刷出，且计入 CountAlive）。
+                // 它必须先领到词条，否则「场上已有 1 只」会把同屏上限吃满，
+                // 于是既不会再刷怪、它也永远不会死——整波卡在那里。
+                if (w == 0 && !entranceUsed && _entranceZombie != null && !_entranceZombie.IsDead && plan.Count > 0)
+                {
+                    var slot = plan[0];
+                    if (TryTakeWord(slot, pools, queues, out string entranceWord))
+                    {
+                        ApplySpawnSettings(_entranceZombie, asset, slot);
+                        typing.SpawnWord(entranceWord, CharacterTrack.Agent, 0f, _entranceZombie.gameObject);
+                        BindWeakness(_entranceZombie, entranceWord, asset.PostWeakWordsOf(slot.type));
+                        next++;
+                        entranceUsed = true;
+                    }
+                }
+
+                while (next < plan.Count || CountAlive() > 0)
+                {
+                    if (next < plan.Count && CountAlive() < limit)
+                    {
+                        var slot = plan[next];
+                        if (!TryTakeWord(slot, pools, queues, out string word)) { yield return null; continue; }
+                        if (!TryPickFreeSpawnPoint(out int point)) { yield return null; continue; }
+
+                        var type = asset.TypeAt(slot.type);
+                        var prefab = type != null && type.prefab != null ? type.prefab : zombiePrefab;
+                        var zombie = CreateEnemy(SpawnPointAt(point), false, LaneAt(point), point, prefab);
+                        ApplySpawnSettings(zombie, asset, slot);
+                        typing.SpawnWord(word, CharacterTrack.Agent, 0f, zombie.gameObject);
+                        BindWeakness(zombie, word, asset.PostWeakWordsOf(slot.type));
+                        next++;
+                        yield return new WaitForSeconds(Mathf.Max(0f, wave.spawnInterval));
+                    }
+                    else yield return null;   // 词首字母冲突 / 没空刷怪点 / 同屏已满：等场上打完再刷
+                }
+            }
+
+            _cleared = true;
+            OnCleared?.Invoke();
+        }
+
+        /// <summary>把这一波拆成「逐只」清单，并按类型轮转交织，避免同一种怪连续扎堆。</summary>
+        private static List<AssetSpawn> BuildWavePlan(CombatEncounterAsset asset, int wave)
+        {
+            var perType = new List<List<AssetSpawn>>();
+            foreach (var (index, _) in asset.EnabledTypes())
+            {
+                var list = new List<AssetSpawn>();
+                for (int i = 0; i < asset.ShortCount(wave, index); i++)
+                    list.Add(new AssetSpawn { type = index, tier = MonsterWordTier.ShortWord });
+                for (int i = 0; i < asset.LongCount(wave, index); i++)
+                    list.Add(new AssetSpawn { type = index, tier = MonsterWordTier.LongWord });
+                if (list.Count > 0) perType.Add(list);
+            }
+
+            var plan = new List<AssetSpawn>();
+            var cursor = new int[perType.Count];
+            bool any;
+            do
+            {
+                any = false;
+                for (int i = 0; i < perType.Count; i++)
+                {
+                    if (cursor[i] >= perType[i].Count) continue;
+                    plan.Add(perType[i][cursor[i]++]);
+                    any = true;
+                }
+            } while (any);
+            return plan;
+        }
+
+        /// <summary>把该怪物该变体的移动速度 / 冲刺速度 / 攻击伤害注入到场上这只怪。</summary>
+        private static void ApplySpawnSettings(TypingTarget zombie, CombatEncounterAsset asset, AssetSpawn slot)
+        {
+            if (zombie == null) return;
+            zombie.ApplyMoveSpeeds(asset.SpeedOf(slot.type, slot.tier), asset.RushOf(slot.type, slot.tier));
+            zombie.ApplyAttackCells(asset.DamageOf(slot.type, slot.tier));
+        }
+
+        /// <summary>从该（怪物类型, 词长）词库里取一个与场上活动词条首字母不冲突的词；词库用完则重新洗牌。</summary>
+        private bool TryTakeWord(AssetSpawn slot, Dictionary<int, string[]> pools, Dictionary<int, Queue<string>> queues, out string word)
+        {
+            word = null;
+            int key = SpawnKey(slot.type, slot.tier);
+            if (!pools.TryGetValue(key, out var pool) || pool.Length == 0) return false;
+            if (!queues.TryGetValue(key, out var queue)) return false;
+
+            for (int attempt = 0; attempt < pool.Length * 2; attempt++)
+            {
+                if (queue.Count == 0)
+                {
+                    var order = new List<string>(pool);
+                    if (_shuffleWords)
+                    {
+                        for (int i = order.Count - 1; i > 0; i--)
+                        {
+                            int j = Random.Range(0, i + 1);
+                            (order[i], order[j]) = (order[j], order[i]);
+                        }
+                    }
+                    foreach (var candidate in order) queue.Enqueue(candidate);
+                }
+
+                string next = queue.Dequeue();
+                if (string.IsNullOrEmpty(next) || IsInitialTaken(next)) continue;
+                word = next;
+                return true;
+            }
+            return false;
         }
 
         private string WaveWord(int index)

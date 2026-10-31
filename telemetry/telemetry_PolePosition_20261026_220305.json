@@ -1,0 +1,100 @@
+{
+    "appVersion": "0.1.0 / Unity 6000.3.8f1",
+    "scene": "PolePosition",
+    "sessionStart": "2026-10-26 22:02:15",
+    "runs": [],
+    "events": [
+        {
+            "t": 0.0,
+            "type": "run_start",
+            "detail": "index=1 variant=viewfinder_on"
+        },
+        {
+            "t": 0.0,
+            "type": "track_forced",
+            "detail": "to=Director"
+        },
+        {
+            "t": 20.67473602294922,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 24.766141891479493,
+            "type": "switch_effective",
+            "detail": "to=Agent after=4.09s"
+        },
+        {
+            "t": 45.83824920654297,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 46.62586975097656,
+            "type": "switch_effective",
+            "detail": "to=Director after=0.79s"
+        },
+        {
+            "t": 47.42100143432617,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 48.091346740722659,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.67s"
+        },
+        {
+            "t": 48.97139358520508,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 49.69860076904297,
+            "type": "switch_effective",
+            "detail": "to=Director after=0.73s"
+        },
+        {
+            "t": 50.181060791015628,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 50.948448181152347,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.77s"
+        }
+    ],
+    "switches": [
+        {
+            "t": 20.67473602294922,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        },
+        {
+            "t": 45.83824920654297,
+            "from": "Agent",
+            "to": "Director",
+            "effective": true
+        },
+        {
+            "t": 47.42100143432617,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        },
+        {
+            "t": 48.97139358520508,
+            "from": "Agent",
+            "to": "Director",
+            "effective": true
+        },
+        {
+            "t": 50.181060791015628,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        }
+    ]
+}

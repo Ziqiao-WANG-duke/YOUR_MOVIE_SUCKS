@@ -313,7 +313,6 @@ namespace YourMovieSucks.EditorTools
         {
             var go = new GameObject("Hud");
             go.AddComponent<DemoHud>();
-            go.AddComponent<HPUI>();
             go.AddComponent<FeedbackUI>();
             go.AddComponent<WordLabelManager>();
             go.AddComponent<ViewfinderOverlay>();
@@ -471,15 +470,7 @@ namespace YourMovieSucks.EditorTools
                 vfSo.ApplyModifiedPropertiesWithoutUndo();
             }
 
-            // HPUI / FeedbackUI / WordLabelManager
-            var hpui = UnityEngine.Object.FindFirstObjectByType<HPUI>();
-            if (hpui != null)
-            {
-                var so = new SerializedObject(hpui);
-                Set(so, "playerHealth", p => p.objectReferenceValue = refs.PlayerHealth);
-                so.ApplyModifiedPropertiesWithoutUndo();
-            }
-
+            // FeedbackUI / WordLabelManager
             var feedback = UnityEngine.Object.FindFirstObjectByType<FeedbackUI>();
             if (feedback != null)
             {

@@ -5,8 +5,8 @@ using YourMovieSucks.Combat;
 namespace YourMovieSucks.Demo
 {
     /// <summary>
-    /// 敌人入场演出：从侧幕冲入舞台 → 抱住钢管（定格）→ 松开后回到常规接近/攻击行为。
-    /// 对应脚本第 5 段「STRIPPER ZOMBIE 冲入舞台，抢先一步抱住钢管」。
+    /// 敌人入场演出：从侧幕冲入舞台 → 站定咆哮（Scream 动画）→ 恢复常规接近/攻击行为。
+    /// 对应脚本第 5 段「STRIPPER ZOMBIE 冲入舞台」；原来抱杆的节拍已改为丧尸咆哮。
     /// </summary>
     [RequireComponent(typeof(TypingTarget))]
     public class StripperZombieEntrance : MonoBehaviour
@@ -16,18 +16,23 @@ namespace YourMovieSucks.Demo
         [Tooltip("冲入舞台的耗时")]
         [SerializeField] private float dashDuration = 0.45f;
 
-        [Tooltip("抱住钢管的定格时长（之后松手恢复常规行为）")]
+        [Tooltip("咆哮定格时长（之后恢复常规行为）")]
         [SerializeField] private float hugHold = 2.5f;
 
-        [Tooltip("抱杆抖动幅度")]
-        [SerializeField] private float hugShake = 0.05f;
+        [Tooltip("咆哮时的轻微颤栗幅度（0 = 完全不动）")]
+        [SerializeField] private float hugShake = 0.02f;
+
+        [Tooltip("咆哮动画状态名（AnimatorController 里的状态）")]
+        [SerializeField] private string screamStateName = "Scream";
 
         private TypingTarget _target;
+        private Animator _animator;
         private Vector3 _hugPosition;
 
         private void Awake()
         {
             _target = GetComponent<TypingTarget>();
+            _animator = GetComponentInChildren<Animator>();
             if (_target != null) _target.Frozen = true; // 入场演出期间不动不攻击
         }
 
@@ -62,21 +67,26 @@ namespace YourMovieSucks.Demo
                 yield return null;
             }
 
-            // 2) 抱住钢管定格（带轻微抖动）
+            // 2) 站定咆哮（带轻微颤栗），播完自动回 Idle
+            if (_animator != null)
+            {
+                _animator.speed = 1f;
+                _animator.Play(screamStateName, 0, 0f);
+                _animator.Update(0f); // 立刻生效，避免下一帧才切
+            }
+
             float held = 0f;
             while (held < hugHold)
             {
                 if (_target != null && _target.IsDead) yield break;
 
                 held += Time.deltaTime;
-                transform.position = _hugPosition + new Vector3(
-                    Mathf.Sin(Time.time * 26f) * hugShake,
-                    Mathf.Abs(Mathf.Sin(Time.time * 14f)) * hugShake,
-                    0f);
+                float shake = hugShake <= 0f ? 0f : Mathf.Sin(Time.time * 24f) * hugShake;
+                transform.position = _hugPosition + new Vector3(shake, 0f, 0f);
                 yield return null;
             }
 
-            // 3) 松手：恢复常规接近/攻击
+            // 3) 结束演出：恢复常规接近/攻击
             if (_target != null) _target.Frozen = false;
             enabled = false;
         }

@@ -1,0 +1,156 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a86dece843eb5084695b3b865a0adedf, type: 3}
+  m_Name: CombatEncounter
+  m_EditorClassIdentifier: Assembly-CSharp::YourMovieSucks.Combat.CombatEncounterAsset
+  types:
+  - displayName: "\u4E27\u5C38"
+    prefab: {fileID: 7541338662265847762, guid: c0e55708ee2fbd443bc2465e465e1724, type: 3}
+    enabled: 1
+    shortWords:
+    - mine
+    - my pole
+    - get off
+    - back off
+    - your turn
+    - not yours
+    - line up
+    - hold still
+    - step back
+    - keep back
+    - walk away
+    shortSpeed: 1.8
+    shortDamage: 1
+    longWords:
+    - wait your turn
+    - this is my stage
+    longSpeed: 1.2
+    longDamage: 1
+    postWeakWords:
+    - pathetic
+    - crybaby
+    - you suck
+    - go cry
+    - eat dirt
+    - get bent
+    - die mad
+    - too easy
+  - displayName: "\u4F8D\u8005\u4E27\u5C38"
+    prefab: {fileID: 665777693521136220, guid: fa2ab0411afcb994285e1189c948f320, type: 3}
+    enabled: 1
+    shortWords:
+    - order up
+    - check please
+    - just a sec
+    - refill please
+    - pour it
+    - five stars
+    - very rude
+    - do it now
+    shortSpeed: 1.2
+    shortDamage: 2
+    longWords:
+    - what can i get you
+    - last call for drinks
+    - you had enough
+    - we are closing soon
+    - get out of my bar
+    longSpeed: 0.8
+    longDamage: 2
+    postWeakWords: []
+  waves:
+  - note: "\u5F00\u573A\u56FA\u5B9A"
+    slots:
+    - shortCount: 2
+      longCount: 0
+    - shortCount: 1
+      longCount: 0
+    spawnInterval: 1
+    maxConcurrent: 4
+    counts: 
+  - note: "\u5F00\u573A\u56FA\u5B9A"
+    slots:
+    - shortCount: 1
+      longCount: 0
+    - shortCount: 0
+      longCount: 1
+    spawnInterval: 1.1
+    maxConcurrent: 1
+    counts: 
+  - note: "\u5F00\u573A\u56FA\u5B9A"
+    slots:
+    - shortCount: 1
+      longCount: 0
+    - shortCount: 1
+      longCount: 0
+    spawnInterval: 1.1
+    maxConcurrent: 1
+    counts: 
+  - note: "\u5F00\u573A\u56FA\u5B9A"
+    slots:
+    - shortCount: 1
+      longCount: 0
+    - shortCount: 0
+      longCount: 1
+    spawnInterval: 1.1
+    maxConcurrent: 1
+    counts: 
+  - note: "\u4E3B\u6218\u6597"
+    slots:
+    - shortCount: 1
+      longCount: 0
+    - shortCount: 2
+      longCount: 0
+    spawnInterval: 1.1
+    maxConcurrent: 2
+    counts: 
+  - note: "\u4E3B\u6218\u6597"
+    slots:
+    - shortCount: 1
+      longCount: 0
+    - shortCount: 2
+      longCount: 0
+    spawnInterval: 1.1
+    maxConcurrent: 2
+    counts: 
+  - note: "\u4E3B\u6218\u6597"
+    slots:
+    - shortCount: 2
+      longCount: 0
+    - shortCount: 0
+      longCount: 1
+    spawnInterval: 1.1
+    maxConcurrent: 2
+    counts: 
+  - note: "\u4E3B\u6218\u6597\u6536\u5C3E"
+    slots:
+    - shortCount: 0
+      longCount: 2
+    - shortCount: 0
+      longCount: 1
+    spawnInterval: 1.1
+    maxConcurrent: 2
+    counts: 
+  shuffleWords: 1
+  defaultPostWeakWords:
+  - pathetic
+  - crybaby
+  - you suck
+  - go cry
+  - eat dirt
+  - get bent
+  - die mad
+  - too easy
+  rushMultiplier: 1.5
+  kinds: []
+  shortWordSpeed: 0.5
+  longWordSpeed: 0.4

@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_BrassPole_Retro
+  m_Shader: {fileID: 4800000, guid: 735d40967b75b1e4793b64507c6a493b, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Affine: 0
+    - _AffineStrength: 0
+    - _AlphaClip: 0
+    - _AmbientStrength: 1
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DiffuseWrap: 0.15
+    - _FlatShading: 1
+    - _LightingBands: 4
+    - _ShadowDarkness: 1
+    - _SnapNearFade: 0.4
+    - _SnapStrength: 0.15
+    - _SpecularPower: 24
+    - _SpecularStrength: 0.5
+    - _UseBaseMap: 0
+    - _UseEmissionMap: 0
+    - _UseVertexColor: 0
+    - _VertexSnap: 1
+    m_Colors:
+    - _AmbientColor: {r: 0.16, g: 0.14, b: 0.2, a: 1}
+    - _BaseColor: {r: 0.85, g: 0.68, b: 0.27999997, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _SnapResolution: {r: 426, g: 240, b: 0, a: 0}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

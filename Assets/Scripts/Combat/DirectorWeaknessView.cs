@@ -10,7 +10,8 @@ namespace YourMovieSucks.Combat
     /// 导演轨「弱点识别」编排（第一版：单只怪的完整闭环，多只怪各自独立、同时最多 5 只）：
     ///
     ///   切到导演轨 → 场上未识别的怪亮红光 + 挂上弱点词（大写、走现有打字判定，**不需要额外的 ZOOM 指令**）
-    ///   输入弱点词 → 标记这只怪已识别 → 把这只怪的战斗词换成更简单的词（首字母冲突时排队等空位，绝不产生吸附歧义）
+    ///   输入弱点词 → 标记这只怪已识别 → 把这只怪的战斗词换成战斗编辑器「弱点后词库」里的新词
+    ///   （词库为空则不换、保持原词；首字母冲突时排队等空位，绝不产生吸附歧义）
     ///   切回特工轨 → 只看得见（新的）战斗词
     ///
     /// **刻意不做镜头动作**：识别弱点不推近、不晃、不改变构图（作者 2026-10-20：战斗中任何镜头动作都是在干扰玩家）。
@@ -28,6 +29,10 @@ namespace YourMovieSucks.Combat
 
         private readonly Dictionary<TypingWord, MonsterWeakness> _wordToWeakness = new();
         private readonly List<MonsterWeakness> _pendingSwaps = new();
+        private readonly HashSet<string> _warnedNoPool = new();
+
+        /// <summary>每个词库（同一怪物类型的同一個数组实例）一个“洗好的袋子”：抽完一轮前不重复，避免总给同一个词。</summary>
+        private readonly Dictionary<string[], Queue<string>> _bags = new();
         private bool _directorView;
 
         private void OnEnable()
@@ -59,10 +64,10 @@ namespace YourMovieSucks.Combat
                 else HideWeaknesses();
             }
 
-            if (!_directorView) return;
-
-            ShowWeaknesses();       // 导演轨期间新刷出来的怪也补上弱点词
+            // 换词排队不能只看“当前在哪条轨”：否则玩家一看回特工视角，待换的词就永远不再重试
             RetryPendingSwaps();
+
+            if (_directorView) ShowWeaknesses();       // 导演轨期间新刷出来的怪也补上弱点词
         }
 
         // ---------------------------------------------------------------- 显示 / 回收
@@ -76,9 +81,27 @@ namespace YourMovieSucks.Combat
                 var target = weakness.GetComponent<TypingTarget>();
                 if (target != null && target.IsDead) continue;
 
+                // 这类怪没有「弱点后词库」（类型词库与默认词库都空）：不给它挂弱点词。
+                // 否则玩家打完弱点却什么都看不到（词不变、弱点也消失），很像 bug。
+                if (!CombatEncounterAsset.HasAnyWord(weakness.PostWeakWords))
+                {
+                    weakness.SetVisible(false);
+                    WarnMissingPool(weakness);
+                    continue;
+                }
+
                 weakness.SetVisible(true);
                 SpawnWeaknessWord(weakness);
             }
+        }
+
+        /// <summary>没有弱点后词库的警告：每种怪只报一次，避免刷屏。</summary>
+        private void WarnMissingPool(MonsterWeakness weakness)
+        {
+            string key = weakness.name.Replace("_Entrance", string.Empty);
+            if (!_warnedNoPool.Add(key)) return;
+            Debug.LogWarning($"[DirectorWeaknessView] {key} 没有配置「弱点后词库」（战斗编辑器 CombatEncounter：怪物配置里的词库，或总览里的默认词库），" +
+                             "所以导演轨不给它挂弱点词（打了也不会换词）。");
         }
 
         private void HideWeaknesses()
@@ -139,19 +162,68 @@ namespace YourMovieSucks.Combat
             var current = FindCombatWord(target.gameObject);
             if (current == null) return;   // 已经不在场上了
 
-            string candidate = weakness.SimplifiedWord;
-            if (!IsInitialFree(candidate, current))
-                candidate = weakness.FirstTokenOfOriginalWord;   // 同首字母兜底：永远是原词的第一个词
-
-            if (!IsInitialFree(candidate, current))
+            string candidate = PickReplacement(weakness, current);
+            if (candidate == null)
             {
-                // 两个候选都被占：先保留原词（怪仍然可击杀），等场上空出首字母再换
+                // 词库/简化词的首字母都被占：先保留原词（怪仍可击杀），等场上空出首字母再换
                 if (!_pendingSwaps.Contains(weakness)) _pendingSwaps.Add(weakness);
                 return;
             }
 
+            if (TypingWord.Normalize(candidate) == current.MatchText) return;   // 新词与当前词一样：不用换
+
             typing.RemoveWord(current);
             typing.SpawnWord(candidate, CharacterTrack.Agent, 0f, target.gameObject);
+        }
+
+        /// <summary>
+        /// 弱点破坏后给这只怪换上的新词：从该怪物类型的「弱点后词库」里随机抽（洗牌后按轮抽，不重复），
+        /// 跳过首字母已破占用的词（避开锁定吸附歧义）。没有可用的词则返回 null（调用方排队等）。
+        /// </summary>
+        private string PickReplacement(MonsterWeakness weakness, TypingWord ignore)
+        {
+            var pool = weakness.PostWeakWords;
+            if (pool == null || pool.Length == 0) return null;
+
+            if (!_bags.TryGetValue(pool, out var bag) || bag == null)
+            {
+                bag = new Queue<string>();
+                _bags[pool] = bag;
+            }
+
+            // 最多抽两轮：首字母被占的词丢掉，继续抽下一个
+            for (int attempt = 0; attempt < pool.Length * 2; attempt++)
+            {
+                if (bag.Count == 0) RefillBag(bag, pool);
+                if (bag.Count == 0) return null;
+
+                string candidate = bag.Dequeue();
+                if (string.IsNullOrWhiteSpace(candidate)) continue;
+                candidate = candidate.Trim();
+                if (candidate.Length == 0) continue;
+                if (!IsInitialFree(candidate, ignore)) continue;
+
+                return candidate;
+            }
+
+            return null;
+        }
+
+        /// <summary>把词库洗牌后装进袋子（抽完一轮才会重复）。</summary>
+        private static void RefillBag(Queue<string> bag, string[] pool)
+        {
+            var words = new List<string>(pool.Length);
+            foreach (var raw in pool)
+                if (!string.IsNullOrWhiteSpace(raw)) words.Add(raw.Trim());
+            if (words.Count == 0) return;
+
+            for (int i = words.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                (words[i], words[j]) = (words[j], words[i]);
+            }
+
+            foreach (var w in words) bag.Enqueue(w);
         }
 
         private void RetryPendingSwaps()
@@ -181,9 +253,9 @@ namespace YourMovieSucks.Combat
                     continue;
                 }
 
-                string candidate = weakness.SimplifiedWord;
-                if (!IsInitialFree(candidate, current)) candidate = weakness.FirstTokenOfOriginalWord;
-                if (!IsInitialFree(candidate, current)) continue;
+                string candidate = PickReplacement(weakness, current);
+                if (candidate == null) continue;
+                if (TypingWord.Normalize(candidate) == current.MatchText) { _pendingSwaps.RemoveAt(i); continue; }
 
                 typing.RemoveWord(current);
                 typing.SpawnWord(candidate, CharacterTrack.Agent, 0f, target.gameObject);

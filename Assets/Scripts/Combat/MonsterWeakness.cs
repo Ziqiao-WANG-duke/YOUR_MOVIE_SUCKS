@@ -10,7 +10,7 @@ namespace YourMovieSucks.Combat
     ///   ② 弱点词条锚点（骨骼上方一点，世界空间词条挂在这里，不按包围盒算高度）
     ///
     /// 状态天然是「每只怪一份」（一个实例一份），不是全局状态。
-    /// 识别不会击杀怪物，只把它的战斗词换成更简单的词。
+    /// 识别不会击杀怪物，只把它的战斗词换成战斗编辑器里该类型「弱点后词库」里的新词。
     /// </summary>
     [RequireComponent(typeof(TypingTarget))]
     public class MonsterWeakness : MonoBehaviour
@@ -38,34 +38,22 @@ namespace YourMovieSucks.Combat
 
         public bool Recognized { get; private set; }
 
+        /// <summary>导演模式可把这个放大一点让弱点更醒目（1 = 不放大）。</summary>
+        public static float GlobalMarkerScale = 1f;
+
         /// <summary>本局这只怪的原始战斗词（由刷怪方写入）。</summary>
         public string OriginalWord { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 战斗编排资产按怪物类型指定的「弱点被破坏后的新词库」（由刷怪方写入）。
+        /// 这是弱点被破坏后唯一的换词来源：空 = 不换词（保持原战斗词）。
+        /// </summary>
+        public string[] PostWeakWords { get; set; } = System.Array.Empty<string>();
 
         public string PartLabel => _entry != null ? _entry.partLabel : string.Empty;
         public string WeakWord => _entry != null ? _entry.weakWord : string.Empty;
         public Transform WeakPoint => _bone != null ? _bone : transform;
         public GameObject LabelAnchor => _anchor != null ? _anchor : gameObject;
-
-        /// <summary>识别后要换上的简单战斗词（配置优先，否则用原词的第一个单词）。</summary>
-        public string SimplifiedWord
-        {
-            get
-            {
-                if (_entry != null && !string.IsNullOrEmpty(_entry.simplifiedWord)) return _entry.simplifiedWord;
-                return FirstTokenOfOriginalWord;
-            }
-        }
-
-        /// <summary>原词的第一个单词（首字母与原词相同 → 换词永远不产生吸附歧义）。</summary>
-        public string FirstTokenOfOriginalWord
-        {
-            get
-            {
-                string word = (OriginalWord ?? string.Empty).Trim();
-                int space = word.IndexOf(' ');
-                return space > 0 ? word.Substring(0, space) : word;
-            }
-        }
 
         public event System.Action<MonsterWeakness> OnRecognized;
 
@@ -94,7 +82,7 @@ namespace YourMovieSucks.Combat
             if (!_visible || Recognized || _marker == null) return;
 
             _pulse += Time.deltaTime;
-            float scale = markerSize * (1f + Mathf.Sin(_pulse * Mathf.PI * 2f * markerPulseHz) * 0.14f);
+            float scale = markerSize * (1f + Mathf.Sin(_pulse * Mathf.PI * 2f * markerPulseHz) * 0.14f) * GlobalMarkerScale;
             _marker.transform.localScale = Vector3.one * scale;
         }
 
@@ -171,13 +159,14 @@ namespace YourMovieSucks.Combat
             _marker.transform.localPosition = Vector3.zero;
             _marker.transform.localScale = Vector3.one * markerSize;
 
-            _markerRenderer = _marker.GetComponent<Renderer>();
-            var shader = Shader.Find("Universal Render Pipeline/Unlit");
+            _markerRenderer = _marker.GetComponent<Renderer>();            var shader = Shader.Find("Universal Render Pipeline/Unlit");
             if (shader == null) shader = Shader.Find("Unlit/Color");
             _markerMaterial = new Material(shader) { name = "M_WeakPointMarker" };
             if (_markerMaterial.HasProperty("_BaseColor")) _markerMaterial.SetColor("_BaseColor", markerColor);
             if (_markerMaterial.HasProperty("_Color")) _markerMaterial.SetColor("_Color", markerColor);
             _markerRenderer.sharedMaterial = _markerMaterial;
+            // 弱点标记单独一层：导演模式下由原生分辨率相机绘制，不经过黑白滤镜，永远保持纯红。
+            _marker.layer = YourMovieSucks.UI.DirectorModeLayers.WeakPoint;
             _marker.SetActive(false);
 
             // ② 词条锚点（骨骼上方一点；世界空间词条挂这里，用固定偏移而不是包围盒）

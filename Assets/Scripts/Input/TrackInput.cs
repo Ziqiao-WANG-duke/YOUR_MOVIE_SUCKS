@@ -145,7 +145,8 @@ namespace YourMovieSucks.Input
 
         private void OnGUI()
         {
-            if (!showDebugOverlay) return;
+            // 调试面板只在编辑器/开发版里画（正式包不显示）
+            if (!showDebugOverlay || !(Application.isEditor || Debug.isDebugBuild)) return;
 
             var style = new GUIStyle(GUI.skin.label)
             {

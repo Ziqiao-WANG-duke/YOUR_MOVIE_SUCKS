@@ -1,0 +1,58 @@
+{
+    "appVersion": "0.1.0 / Unity 6000.3.8f1",
+    "scene": "PolePosition",
+    "sessionStart": "2026-10-27 09:30:22",
+    "runs": [],
+    "events": [
+        {
+            "t": 0.0,
+            "type": "run_start",
+            "detail": "index=1 variant=viewfinder_on"
+        },
+        {
+            "t": 0.0,
+            "type": "track_forced",
+            "detail": "to=Director"
+        },
+        {
+            "t": 22.515775680541993,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 25.732297897338868,
+            "type": "track_switch",
+            "detail": "to=Director"
+        },
+        {
+            "t": 25.899099349975587,
+            "type": "track_switch",
+            "detail": "to=Agent"
+        },
+        {
+            "t": 26.122407913208009,
+            "type": "switch_effective",
+            "detail": "to=Agent after=0.22s"
+        }
+    ],
+    "switches": [
+        {
+            "t": 22.515775680541993,
+            "from": "Director",
+            "to": "Agent",
+            "effective": false
+        },
+        {
+            "t": 25.732297897338868,
+            "from": "Agent",
+            "to": "Director",
+            "effective": false
+        },
+        {
+            "t": 25.899099349975587,
+            "from": "Director",
+            "to": "Agent",
+            "effective": true
+        }
+    ]
+}

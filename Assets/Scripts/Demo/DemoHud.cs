@@ -26,8 +26,9 @@ namespace YourMovieSucks.Demo
         [Header("节奏")]
         [SerializeField] private float bannerDuration = 1.8f;
 
-        private static readonly Color AgentColor = new Color(1f, 0.25f, 0.25f);
-        private static readonly Color DirectorColor = new Color(0.32f, 0.56f, 1f);
+        // 轨道识别色：AGENT = 蓝、DIRECTOR = 红（两条轨道互换过，文案里的颜色提示也要跟着改）
+        private static readonly Color AgentColor = new Color(0.32f, 0.56f, 1f);
+        private static readonly Color DirectorColor = new Color(1f, 0.25f, 0.25f);
 
         // 与 WordLabel 保持一致：未打=白、已完成=绿。当前待输入字母不再染色，改由箭头指出
         // （旧版把首字母染黄，玩家会以为已经打过、从第二个字母开始输）。
@@ -208,8 +209,8 @@ namespace YourMovieSucks.Demo
             {
                 _trackBadge.color = color;
                 _trackBadge.text = agent
-                    ? "AGENT TRACK   —   lowercase words / red targets"
-                    : "DIRECTOR TRACK   —   UPPERCASE words / viewfinder on";
+                    ? "AGENT TRACK   —   lowercase words / blue targets"
+                    : "DIRECTOR TRACK   —   UPPERCASE words / red markers";
             }
         }
 
