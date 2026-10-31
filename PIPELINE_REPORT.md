@@ -1,95 +1,39 @@
-# PIPELINE REPORT —《YOUR MOVIE SUCKS!》Lab C
+# YOUR MOVIE SUCKS! — Lab C Pipeline Report
+**3D Track · Unity 6 / URP · Author-verified review, October 31, 2026**
 
-**Track: 3D** ｜ 引擎：Unity 6000.3.8f1 / URP 17 ｜ 交付：Windows x64 构建
-**Hero assets**：主要威胁 StripperZombie（骨骼 + 12 段动画）；Player = 第一人称摄影机（见 §5.2）
+## Pipeline assessment
+The game extends a typing-shooter prototype into a stylized 3D nightclub zombie encounter. My visual references were *The Typing of the Dead: Overkill*, PS1-era rendering artifacts and exaggerated B-movie filmmaking. I developed two enemy concepts (bartender and bikini zombies) with Gemini, generated 3D models and a pole stage using Tripo, used Mixamo for rigging/animation, and made targeted manual texture, lighting and UI corrections. ChatGPT translated my shader requirements into instructions for Astra; an AI coding agent implemented and integrated systems within Unity.
 
----
+| Stage / group | AI usefulness (creator score) | Actual time | Traditional alternative |
+|---|---:|---:|---|
+| Gemini character concepts | 4/5 | 60 min | ~240 min manual drawing |
+| Tripo 3D models | 4/5 | 30 min | ~240 min adapting 2 existing models |
+| ChatGPT + Astra PS1 shader | 5/5 | 30 min | Not feasible independently at current skill level |
+| Mixamo rigging + animation | 5/5 | 10 min | ~10 min with same established tool |
+| AI agent environment + lighting | 4/5 | 8 min | Less than 8 min manually, creator estimate |
+| AI-assisted UI + HUD editor | 3/5 | 40 min | ~60 min for simpler manual HUD |
+| AI-assisted integration + tests | 4/5 | 180 min | ~180 min |
+| Other VFX, separate texturing, SFX, music, voice | Not separately rated | Not tracked | Not estimated |
 
-## 1. 阶段与评级总表
+**Recorded time:** 358 minutes across the seven groups above; this is not total production time. Across five partially comparable groups, ~320 minutes with tools versus ~730 minutes estimated alternative: **~410 minutes (6h 50m) difference**, not net whole-project savings. Shader has no numeric baseline, environment may have cost time, and a manual UI lacks equivalent editor functionality. **Reported expenses:** Tripo ~RMB 80 for a month, DeepSeek-powered coding agent ~RMB 80, Astra shader work about USD 20; no exchange-rate conversion or inferred spending for unreported tools.
 
-| 管线 | 阶段 | 评级 | 耗时 | 结论 |
-|---|---|---|---|---|
-| 3D | 0 Art direction | 5 | 【待补】 | 一次定死风格，后续返工最少 |
-| 3D | 1 Concept + turnaround | 2 | 【待补】 | **缺口**：没做独立概念图 |
-| 3D | 2 Modeling | 3 | 【待补】 | 外部网格 + 手工缩放/脚底/朝向 |
-| 3D | 3 Texturing | 3 | 【待补】 | 环境自制；敌人贴图偏弱 |
-| 3D | 4 Rigging | 4 | 【待补】 | Humanoid + 根运动，问题有明确判据 |
-| 3D | 5 Animation | 3 | 【待补】 | 打击感重做过一轮 |
-| 共享 | Environment | 4 | 【待补】 | 程序化重建，改动成本低 |
-| 共享 | UI | 4 | 【待补】 | 多次重做（字体/血条/轨道色） |
-| 共享 | VFX | 4 | 【待补】 | 三个关键瞬间可开关 |
-| 共享 | Lighting | 3 | 【待补】 | 缺反射探针 |
-| 共享 | Integration & review | 4 | 【待补】 | 自动化自检 + 一键打包 |
-| SFX | 1–5 | 3/4/4/4/3 | 【待补】 | 4 类已入游戏，6 个触发点待做 |
-| Music | 1–4 | 4/4/3/4 | 【待补】 | 气质对，但时长超 30–90s 要求 |
-| Voice | 1–6 | 4/4/【待补】/【待补】/4/3 | 【待补】 | 13 句已接入带字幕；10 句反应台词未接 |
+## Where AI was most valuable
+**1. Shader enablement (5/5).** I researched vertex snapping and distorted texture mapping with help from my technical-art instructor, described my goals to ChatGPT, and gave the resulting technical brief to Astra. This provided a functioning PS1-like rendering direction that I could not independently program with my present shader experience. The value was capability, not just speed.
 
-> 明细与每条的 keep/redo 理由见 `STAGE_LOG.md`。
+**2. Concept development (4/5).** Gemini produced two usable character turnarounds in one hour rather than my estimated four hours of drawing. The concept sheets provided consistent references for the next stage, although they still required selection and visual review.
 
-## 2. AI 帮助最大的三个阶段
+**3. Model generation (4/5).** Tripo converted those sheets into assets in about 30 minutes. The intentionally imperfect, low-detail appearance suits this game's retro visual goals. This would not imply equal suitability for clean high-fidelity hero models.
 
-1. **Integration & review（共享阶段，评级 4）**
-   证据：`BUILD_LOG.md` 里每一次改动都伴随「批处理自检 N pass / 0 fail」+ 截图，例如弱点闭环 15 pass、枪声层 31 pass；`BuildWindows` 一键出包 9–15 秒。
-   *结论*：AI 在「写验收代码 + 跑回归 + 读日志定位」这件事上已经比人快一个数量级，而且是可验证的（不是感觉）。
+## Where AI helped least
+**1. Environment/lighting.** Despite the combined 4/5 score for output usefulness, my simple initial nightclub would likely have been faster and more visually effective to build manually. I refined lighting, values and textures myself.
 
-2. **UI / shader 实现（Shared · UI art，评级 4）**
-   证据：`UIAlwaysOnTop.shader` 漏 `float4 _TextureSampleAdd` 导致字形渲成黑色——这类问题人眼只能看出「字是黑的」，AI 能直接从字体图集 Alpha8 的成因定位到一行 HLSL；同类还有 `UIHealthCellMask` 的逐格遮罩与 9 格 UV 边界实测。
-   *结论*：把「美术意图 → 着色器/UGUI 参数」翻译成代码，是最省时间的一环。
+**2. HUD editor (3/5).** AI generated a useful custom editing interface, but its preview-to-game scale mismatch required multiple rounds of corrective prompting. The modest 20-minute time difference against manual HUD layout does not compare identical features.
 
-3. **Audio implementation（SFX Stage 4，评级 4）**
-   证据：`VoLibrary`（id→clip）与 `TypingSfxPlayer` 的池化/门控设计，让换素材只换文件；导入层踩到「Unity 6.3 不能导 m4a」时，用 dotnet + NAudio 写了个转码工具，23/23 一次通过。
-   *结论*：管线型代码（资产 id、批量处理、导入规则）是 AI 的甜区。
+**3. Integration/testing time (4/5).** The agent helped solve technical problems and automate work, but I estimate similar total time without it. Mixamo was excellent (5/5) but is an established non-generative animation workflow I would have used anyway, so it is not evidence of savings from generative AI.
 
-## 3. AI 帮助最小的三个阶段
+## Human decisions, constraints, and producer recommendation
+I used web-sourced sound effects and a friend's performances rather than AI-generated audio, because I preferred their character and fit. The instructor reportedly allowed explanation of this choice in class. The repository currently documents 13 integrated captioned dialogue lines and 10 additional reaction recordings not yet triggered. The approximately four-minute soundtrack is a complete commercial recording; permission to distribute it has **not** been verified, and it does not meet the brief's 30–90-second loop. Free-access sound sources also lack recovered licenses. This is an unresolved rights and compliance issue, including for the public GitHub history, not cleared by educational intent.
 
-1. **Concept art（3D Stage 1，评级 2）**
-   证据：本项目**根本没有产出概念图**，直接用引擎 look-dev 代替（`STAGE_LOG.md` 3D·Stage 1）。这不是「AI 做得差」，而是「这一步没做」——也恰恰是 AI 最该被用上的地方（一次出四张候选比例图）。
+The game is a Windows standalone build rather than a verified two-browser experience. The two enemy assets replace a visible player asset because gameplay is first-person; teacher acceptance of both deviations should be confirmed. Evidence images and complete asset provenance must still be placed in the repository.
 
-2. **3D Modeling / Texturing 的最终形态（评级 3/3）**
-   证据：两个敌人的网格与基础色贴图来自外部素材包；AI 只在「缩放 1.25 → 2.20 m、脚底对齐、朝向 +Z」这类**数值修正**上有帮助，没有参与真正的造型与贴图创作。
-   *结论*：文本/图片生成 3D 的拓扑、UV、贴图一致性还不足以承担 hero 资产。
-
-3. **Music 与 Voice 的创作环节（评级 4 / 3，但 AI 参与度是 0–低）**
-   证据：曲子 4:00 由作者提供的 mp4 转码而来；配音是 23 个现成文件。这两条管线的 AI 部分**没有记录**（`STAGE_LOG.md` 中标 【待补】），所以不能把成果归功于 AI。
-
-## 4. 时间与成本（AI 省了多少 / 花了多少）
-
-| 项 | 数值 |
-|---|---|
-| 有 AI 的实际总耗时 | 【待补】小时（按 `STAGE_LOG.md` 各阶段累加） |
-| 无 AI 的估算总耗时 | 【待补】小时（尤其概念/建模/配乐三项会贵很多） |
-| 净节省 | 【待补】（我的估计：**30–50%**，主要来自 integration / UI / 调试；美术与音乐几乎没省） |
-| 花的钱 | 【待补：订阅与单月计划；写清每个工具的 plan 名称与月费】 |
-| 返工成本 | 可测量的一类返工：**血条素材换 2 次、UI 着色器修过三处（字形渲成黑色 / 逐格遮罩 UV / 打包时被剥掉）、轨道配色互换 1 次**——这些在 AI 参与下每次只需 10–30 分钟，人工目测 + 改代码会更久 |
-
-> 诚实说明：本项目大量使用了 **AI 编码/工具助手（Locus）**，它同时扮演「写代码的人」「跑验收的人」和「读日志定位问题的人」。这部分的节省是可举证的；而美术生成类工具的节省，本项目**没有数据**，因为那些阶段要么用了外部素材包、要么没做。
-
-## 5. 两处必须写清的取舍（避免被判「没做」）
-
-### 5.1 交付形态：Windows x64，而不是浏览器 live URL
-
-- 作业验收措辞是「working in two browsers with a mute key」。本作实际交付为 **Windows x64 构建 + 非公开下载链接**。
-- 原因：工程只安装了 Windows 构建模块；且核心操作是 **CapsLock 切轨 + 键盘打字**，浏览器端 CapsLock 事件的可靠性需要单独验证，改用 WebGL 会在最后一周引入不可控风险。
-- 已做补偿：**静音键 `[M]` 已实现并持久化**（标题画面与游戏内都可用），`[V]` 可一键关闭全部 VFX；构建附带 `README-试玩说明.txt`。
-- 若必须补浏览器版本：装 Unity WebGL 模块 → 先在浏览器验 CapsLock（不通则启用 Ctrl/Shift 兼容切轨）→ itch.io 非公开页。预计 1–2 天。
-
-### 5.2 Player 不计入「可见角色」的 hero 资产
-
-- 本作是第一人称（玩家 = 摄影机 + 打字武器），场景里**没有玩家身体模型**，因此 Stage 2–5 的等价产物是：机位与运镜设计（`DollyTrack` + 4 个 waypoint）、取景框 UI、注视点（`PoleHugAnchor`）、打击反馈（血效 / 红闪 / 敌人染色）。
-- 为什么不加：加一个只在开场/结尾出现 2 秒的第三人称模型，需要新增镜头段、动画、绑定与打光，收益是「表格上有一个 model」，风险是**打断开场节奏**（本作已多次因为战斗中的镜头动作被判为干扰）。
-- 补偿：第二个敌人（Zombie_Waiter）**走完了和主敌人相同的 2–5 阶段**，可用来证明「管线可复制」，而不是只有一个资产撑完整张表。
-
-### 5.3 已知不符合作业数值要求的两处
-
-| 项 | 要求 | 现状 | 处理建议 |
-|---|---|---|---|
-| 音乐时长 | 30–90s 循环 | 4:00（`bgm_show_me_love.mp3`） | 剪 60s 循环版并在 `STAGE_LOG` 记一笔，或在报告里明确说明「保留全长版，理由：…」 |
-| 音效数量 | 6+ 个走完五阶段 | 4 类已入游戏 | 补 #6 弱点破坏 / #7 门词完成 / #9 结算屏 三个关键瞬间（见 `docs/sound-list.md` §1） |
-
-## 6. 制片人式建议
-
-> **如果我来运营一个五人小工作室**，我会这样用 AI：
-
-- **会用**：集成与调试、自动化验收（回归脚本 + 截图对比）、管线型代码（资产 id、导入规则、批量转码）、UI/着色器实现、字幕与本地化初稿、AI 试音与音乐草案。
-- **不会用**：hero 资产最终造型与绑定、混音与母带、角色声音的最终交付（授权与条款风险）、Spotting 与音乐方向判断。
-- **铁律**：每一环都要有「人眼/人耳验收」这一道门槛，而且**验收标准要写成文档**（本项目的判据在 `style/STYLE.md` §6）。AI 最危险的不是做不好，而是「做得像那么回事但你不知道哪里不对」——所以自检与日志比生成更重要。
+**If I led a five-person studio,** I would use AI for early concepts, low-detail asset prototypes, shader/code drafting, and mechanical integration, with human art direction and in-engine checks. I would not trust AI-generated UI tooling without pixel-accurate validation, nor use unverified audio rights or generated asset provenance without records. My central lesson is that AI is most useful when judged against the actual task, not when its contribution is automatically treated as a time saving.
